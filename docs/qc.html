@@ -436,7 +436,7 @@ div.tocify {
 <li>Mean genotype quality <span class="math inline">\(&lt; 85\)</span></li>
 </ul>
 <p>Thresholds used were based on plotting the distributions of these metrics. A full collection of plots can be found in the <a href="https://github.com/astheeggeggs/BipEx/tree/master/QC_plots/sample_plots">repository</a>. Here we show boxplots with overlaid scatterplots of the above metrics, split by sequencing batch, and coloured by location. The threshold for exclusion is shown as a dashed line.</p>
-<p><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/03_callRate_by_batch.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/03_contamination_by_batch.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/03_chimeras_by_batch.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/03_dpMean_by_batch.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/03_gqMean_by_batch.jpg" width="100%" /></p>
+<p><img src="../QC_plots/sample_plots/03_callRate_by_batch.jpg" width="100%" /><img src="../QC_plots/sample_plots/03_contamination_by_batch.jpg" width="100%" /><img src="../QC_plots/sample_plots/03_chimeras_by_batch.jpg" width="100%" /><img src="../QC_plots/sample_plots/03_dpMean_by_batch.jpg" width="100%" /><img src="../QC_plots/sample_plots/03_gqMean_by_batch.jpg" width="100%" /></p>
 <p>Following this step, we export high quality variants (allele frequency between 0.01 to 0.99 with high call rate (&gt; 0.98)) to plink format and prune to pseudo-independent SNPs using <code>--indep 50 5 2</code>. This pruned set of SNPs feeds into the next few stages of the QC pipeline.</p>
 <p><br></p>
 </div>
@@ -449,12 +449,12 @@ div.tocify {
 <li>F-statistic <span class="math inline">\(&lt; 0.6\)</span> and the sex is male in the phenotype file</li>
 </ul>
 <p>Here we show the distribution of the F-statistic, with the <span class="math inline">\(0.6\)</span> threshold defining our sex impututation shown as a dashed line.</p>
-<p><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/05_imputesex_histogram.jpg" width="100%" /> <br></p>
+<p><img src="../QC_plots/sample_plots/05_imputesex_histogram.jpg" width="100%" /> <br></p>
 </div>
 <div id="ibd" class="section level1">
 <h1>IBD</h1>
 <p>Using the <code>identity_by_descent</code> method in hail, we evaluate <span class="math inline">\(\hat{\pi}\)</span> between pairs of samples, and filter based on a threshold of <span class="math inline">\(0.2\)</span> shown as a dashed line on the plot below.</p>
-<p><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/06_IBD_plot.jpg" width="100%" /></p>
+<p><img src="../QC_plots/sample_plots/06_IBD_plot.jpg" width="100%" /></p>
 <p>We then create a sample list of patients such that no pair has <span class="math inline">\(\hat{\pi} &gt; 0.2\)</span>.</p>
 <p><br></p>
 </div>
@@ -465,15 +465,15 @@ div.tocify {
 <div id="initial-pca" class="section level2">
 <h2>Initial PCA</h2>
 <p>We first run PCA on samples after removing relateds and those that passed initial QC, using the pruned set of variants.</p>
-<p><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/09_PC1_PC2_collection.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/09_PC3_PC4_collection.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/09_PC5_PC6_collection.jpg" width="100%" /></p>
+<p><img src="../QC_plots/sample_plots/09_PC1_PC2_collection.jpg" width="100%" /><img src="../QC_plots/sample_plots/09_PC3_PC4_collection.jpg" width="100%" /><img src="../QC_plots/sample_plots/09_PC5_PC6_collection.jpg" width="100%" /></p>
 <p><br></p>
 </div>
 <div id="pca-including-1000-genomes" class="section level2">
 <h2>PCA including 1000 genomes</h2>
 <p>Next, we included the 1000 genomes samples (minus the small subset of related individuals within 1000 geneomes), and rerun PCA after including those individuals. Plots of the first six principal components are shown below. 1000 genomes samples are coloured in dark blue.</p>
-<p><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/10_PC1_PC2_1kg_collection.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/10_PC3_PC4_1kg_collection.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/10_PC5_PC6_1kg_collection.jpg" width="100%" /></p>
+<p><img src="../QC_plots/sample_plots/10_PC1_PC2_1kg_collection.jpg" width="100%" /><img src="../QC_plots/sample_plots/10_PC3_PC4_1kg_collection.jpg" width="100%" /><img src="../QC_plots/sample_plots/10_PC5_PC6_1kg_collection.jpg" width="100%" /></p>
 <p>We restrict to the European subset of individuals to perform analysis. To do this, we train a random forest on the super populations labels of 1000 genomes and predict the super population that each of the BipEx samples. We denote strictly defined European subset as those with probability <span class="math inline">\(&gt; 0.9\)</span> of being European according to the classifier. BipEx samples are coloured by their assignment or unsure if none of the classifier probabilities exceeded <span class="math inline">\(0.9\)</span> in the following plots.</p>
-<p><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/10_PC1_PC2_classify_EUR_strict.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/10_PC3_PC4_classify_EUR_strict.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/10_PC5_PC6_classify_EUR_strict.jpg" width="100%" /></p>
+<p><img src="../QC_plots/sample_plots/10_PC1_PC2_classify_EUR_strict.jpg" width="100%" /><img src="../QC_plots/sample_plots/10_PC3_PC4_classify_EUR_strict.jpg" width="100%" /><img src="../QC_plots/sample_plots/10_PC5_PC6_classify_EUR_strict.jpg" width="100%" /></p>
 <p>Samples not assigned to the European cluster were removed from downstream analysis.</p>
 <p>In addition, using a much looser definition of European, we restrict to US samples from MGH and Johns Hopkins, and run PCA. This enabled us to identify Ashkenazi Jewish clusters, and create a list of outliers (AJ or otherwise) for downstream removal or independent analysis.</p>
 <p>Run also ran a further collection of PCAs on:</p>
@@ -502,9 +502,9 @@ div.tocify {
 <li><span class="math inline">\(p\)</span>-value for Hardy Weinberg Equilibrium <span class="math inline">\(&lt; 10^{−6}\)</span></li>
 </ul>
 <p>The following plots show the <span class="math inline">\(0.97\)</span> threshold for call rate and <span class="math inline">\(0.02\)</span> threshold for difference in call rate between cases and controls respectively.</p>
-<p><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/15_call_rate_cdf.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/15_call_rate_diff.jpg" width="100%" /></p>
+<p><img src="../QC_plots/sample_plots/15_call_rate_cdf.jpg" width="100%" /><img src="../QC_plots/sample_plots/15_call_rate_diff.jpg" width="100%" /></p>
 <p>After these steps we plot the resulting changes in metrics across the samples in our data set. Each of the following plots splits the data by sequencing data and colours the points based on location. The first collection of subplots in each figure shows the variant metrics before sample removal, with the lower collection of subplots showing the resultant change after our QC steps.</p>
-<p><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/16_nSingletonsbyBatchColLocation.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/16_rHetHomVarbyBatchColLocation.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/16_rInsertionDeletionbyBatchColLocation.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/16_rTiTvbyBatchColLocation.jpg" width="100%" /></p>
+<p><img src="../QC_plots/sample_plots/16_nSingletonsbyBatchColLocation.jpg" width="100%" /><img src="../QC_plots/sample_plots/16_rHetHomVarbyBatchColLocation.jpg" width="100%" /><img src="../QC_plots/sample_plots/16_rInsertionDeletionbyBatchColLocation.jpg" width="100%" /><img src="../QC_plots/sample_plots/16_rTiTvbyBatchColLocation.jpg" width="100%" /></p>
 <p><br></p>
 </div>
 <div id="final-sample-filtering" class="section level1">
@@ -516,7 +516,7 @@ div.tocify {
 <li>Ratio of transitions to transversions</li>
 </ul>
 <p>As a final step, we export common (allele frequency between <span class="math inline">\(0.01\)</span> and <span class="math inline">\(0.99\)</span>) variants to plink format, prune, and evaluate final principal components for downstream analysis. The first six principal components are displayed below and coloured by case status.</p>
-<p><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/18_PC1_PC2_final_PCs.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/18_PC3_PC4_final_PCs.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/18_PC5_PC6_final_PCs.jpg" width="100%" /></p>
+<p><img src="../QC_plots/sample_plots/18_PC1_PC2_final_PCs.jpg" width="100%" /><img src="../QC_plots/sample_plots/18_PC3_PC4_final_PCs.jpg" width="100%" /><img src="../QC_plots/sample_plots/18_PC5_PC6_final_PCs.jpg" width="100%" /></p>
 <p><br></p>
 <p>After all of this data cleaning, we save the resultant hail matrix tables for downstream analyses.</p>
 </div>
