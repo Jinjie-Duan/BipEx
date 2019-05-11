@@ -1,0 +1,199 @@
+---
+title: "Quality control pipeline"
+output: 
+  html_document:
+    theme: united
+    highlight: tango
+    df_print: paged
+    toc: true
+    toc_depth: 2
+    toc_float: true
+
+---
+
+On this page we detail the quality control (QC) pipeline for for the BipEx dataset. Further plots, the underlying [code](https://github.com/astheeggeggs/BipEx/tree/master/scripts_Dalio/QC_Dalio) and a [document](https://github.com/astheeggeggs/BipEx/blob/master/scripts_Dalio/QC_Dalio/QC_pipeline_writeup/pipeline_writeup.tex) summarising the pipeline can be found on the BipEx github [repository](https://github.com/astheeggeggs/BipEx).
+
+<br>
+
+# Initial genotype filtering
+
+Our first step (after conversion of the joint called `.vcf` file to a hail matrix table) is to remove genotypes based on the following collection of criteria:
+
+* If homozygous reference, remove if at least one of the following is true:
+    + Reference allele depth divided by total depth $< 0.8$
+    + Genotype quality $< 20$
+    + Depth $< 10$
+
+* If heterozygous, at least one of the following is true:
+    + (Reference allele depth + alternative allele depth) divided by total depth $< 0.8$
+    + Alternative allele depth divided by total depth $< 0.2$
+    + Reference phred-scaled genotype posterior $< 20$
+    + Depth $< 10$
+
+* If homozygous variant, at least one of the following is true:
+    + Alternative allele depth divided by total depth $< 0.2$
+    + Reference phred-scaled genotype posterior $< 20$ 
+    + Depth $< 10$
+
+<br>
+
+# Initial variant filtering
+
+Remove variants that either:
+
+*  Fall in a low complexity region
+*  Fail VQSR
+
+<br>
+
+# Initial sample quality control
+
+We run the sample_qc function in hail and remove samples according to the following:
+
+* Sample call rate $< 0.94$
+* FREEMIX contamination (%) $> 0.002$
+* Percentage chimeras (%) $> 0.0015$
+* Mean depth $< 30$
+* Mean genotype quality $< 85$
+
+Thresholds used were based on plotting the distributions of these metrics. A full collection of plots can be found in the [repository](https://github.com/astheeggeggs/BipEx/tree/master/QC_plots/sample_plots). Here we show boxplots with overlaid scatterplots of the above metrics, split by sequencing batch, and coloured by location. The threshold for exclusion is shown as a dashed line.
+
+```{r init_samples, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/03_callRate_by_batch.jpg")
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/03_contamination_by_batch.jpg")
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/03_chimeras_by_batch.jpg")
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/03_dpMean_by_batch.jpg")
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/03_gqMean_by_batch.jpg")
+```
+
+Following this step, we export high quality variants (allele frequency between 0.01 to 0.99 with high call rate (> 0.98)) to plink format and prune to pseudo-independent SNPs using `--indep 50 5 2`. This pruned set of SNPs feeds into the next few stages of the QC pipeline.
+
+<br>
+
+# Sex imputation
+
+We impute the sexes of the individuals with this pruned set of variants on the X chromosome, and create list of samples with incorrect or unknown sex as defined by:
+
+* Sex is unknown in the phenotype files
+* F-statistic $> 0.6$ and the sex is female in the phenotype file
+* F-statistic $< 0.6$ and the sex is male in the phenotype file
+
+Here we show the distribution of the F-statistic, with the $0.6$ threshold defining our sex impututation shown as a dashed line.
+
+```{r impute_sex, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/05_imputesex_histogram.jpg")
+```
+<br>
+
+# IBD
+
+Using the `identity_by_descent` method in hail, we evaluate $\hat{\pi}$ between pairs of samples, and filter based on a threshold of $0.2$ shown as a dashed line on the plot below.
+
+```{r ibd, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/06_IBD_plot.jpg")
+```
+
+We then create a sample list of patients such that no pair has $\hat{\pi} > 0.2$.
+
+<br>
+
+# PCA
+
+We next perform a number of principal component analysis (PCA) steps to ensure that we have matched cases and controls in our cleaned dataset. 
+
+<br>
+
+## Initial PCA
+We first run PCA on samples after removing relateds and those that passed initial QC, using the
+pruned set of variants.
+
+```{r pca, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/09_PC1_PC2_collection.jpg")
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/09_PC3_PC4_collection.jpg")
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/09_PC5_PC6_collection.jpg")
+```
+
+<br>
+
+## PCA including 1000 genomes
+
+Next, we included the 1000 genomes samples (minus the small subset of related individuals within 1000 geneomes), and rerun PCA after including those individuals. Plots of the first six principal components are shown below. 1000 genomes samples are coloured in dark blue.
+
+```{r pca_1kg, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/10_PC1_PC2_1kg_collection.jpg")
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/10_PC3_PC4_1kg_collection.jpg")
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/10_PC5_PC6_1kg_collection.jpg")
+```
+
+We restrict to the European subset of individuals to perform analysis. To do this, we train a random forest on the super populations labels of 1000 genomes and predict the super population that each of the BipEx samples. We denote strictly defined European subset as those with probability $> 0.9$ of being European according to the classifier. BipEx samples are coloured by their assignment or unsure if none of the classifier probabilities exceeded $0.9$ in the following plots.
+
+```{r pca_1kg_class_EUR_strict, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/10_PC1_PC2_classify_EUR_strict.jpg")
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/10_PC3_PC4_classify_EUR_strict.jpg")
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/10_PC5_PC6_classify_EUR_strict.jpg")
+```
+
+Samples not assigned to the European cluster were removed from downstream analysis.
+
+In addition, using a much looser definition of European, we restrict to US samples from MGH and Johns Hopkins, and run PCA. This enabled us to identify Ashkenazi Jewish clusters, and create a list of outliers (AJ or otherwise) for downstream removal or independent analysis.
+
+Run also ran a further collection of PCAs on:
+
+* Strictly defined Europeans and Ashkenazi Jewish individuals
+    + Use Ashkenazi Jewish cluster to train a random forest and determine if there are further Ashkenazi Jews in the remainder of the dataset.
+* Strictly defined Europeans
+* Strictly defined Europeans, restricting to all but Swedes
+* Strictly defined Europeans, restricting to the Swedes
+
+However, upon restriction to the European cluster and after removal of AJs, we find that we have a dense case-control matched collection of samples and so decide not to analyse Swedes, Finns and Europeans (excluding Finns and Swedes) separately.
+
+<br>
+
+# Final variant filtering
+
+For our final variant filtering step, we first restrict to samples in the strictly defined European subset, filter to the unrelated list, and filter out samples with incorrectly defined sex or unknown sex, and run variant QC. We then evaluate a collection of variant metrics and remove variants that satisfy at least one of:
+
+* Invariant site in cleaned sample subset
+* Call rate $< 0.97$
+* Control call rate $< 0.97$
+* Case call rate $< 0.97$
+* $|$Case call rate - Control call rate$| > 0.02$
+* $p$-value for Hardy Weinberg Equilibrium $< 10^{−6}$
+
+The following plots show the $0.97$ threshold for call rate and $0.02$ threshold for difference in call rate between cases and controls respectively.
+
+```{r final_variant, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/15_call_rate_cdf.jpg")
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/15_call_rate_diff.jpg")
+```
+
+After these steps we plot the resulting changes in metrics across the samples in our data set. Each of the following plots splits the data by sequencing data and colours the points based on location. The first collection of subplots in each figure shows the variant metrics before sample removal, with the lower collection of subplots showing the resultant change after our QC steps.
+
+```{r final_sample, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/16_nSingletonsbyBatchColLocation.jpg")
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/16_rHetHomVarbyBatchColLocation.jpg")
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/16_rInsertionDeletionbyBatchColLocation.jpg")
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/16_rTiTvbyBatchColLocation.jpg")
+```
+
+<br>
+
+# Final sample filtering
+
+In this step we remove sample outliers after the variant cleaning in the previous step. Samples are removed if at least on of the following lies more that three standard deviations away from the mean:
+
+* Ratio of heterozygous to homozygous variant
+* Ratio of insertions to deletions
+* Ratio of transitions to transversions
+
+As a final step, we export common (allele frequency between $0.01$ and $0.99$) variants to plink format, prune, and evaluate final principal components for downstream analysis. The first six principal components are displayed below and coloured by case status. 
+
+```{r final_pca, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/18_PC1_PC2_final_PCs.jpg")
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/18_PC3_PC4_final_PCs.jpg")
+knitr::include_graphics("~/Repositories/BipEx/QC_plots/sample_plots/18_PC5_PC6_final_PCs.jpg")
+```
+
+<br>
+
+After all of this data cleaning, we save the resultant hail matrix tables for downstream analyses.

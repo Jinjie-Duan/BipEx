@@ -1,4 +1,4 @@
-\title{Pipeline Dalio}
+\title{Bipolar Exome Sequencing Pipeline}
 \author{Duncan Palmer}
 \date{}
 
@@ -43,78 +43,77 @@
 \graphicspath{{../../../QC_plots/sample_plots/}{../../../QC_plots/variant_plots/}}
 \maketitle
 \begin{itemize}
-	\item Filter GT content from joint called .vcf. Throw away the following (01\_load\_vcf\_filterGT.py):
+	\item Filter genotype content from joint called .vcf. Throw away the following (\href{https://github.com/astheeggeggs/BipEx/blob/master/scripts_Dalio/QC_Dalio/01_load_vcf_filterGT.py}{01\_load\_vcf\_filterGT.py}):
 	\begin{itemize}
-		\item If hom ref, at least one of:
+		\item If homozygous reference, at least one of:
 		\begin{itemize}
-			\item (ref allele depth)/depth $< 0.8$
-			\item genotype quality $< 20$
-			\item depth $< 10$
+			\item (Reference allele depth)/depth $< 0.8$
+			\item Genotype quality $< 20$
+			\item Depth $< 10$
 		\end{itemize}
-		\item If het, at least one of:
+		\item If heterozygous, at least one of:
 		\begin{itemize}
-			\item (ref allele depth + alt allele depth)/depth $< 0.8$
-			\item (alt allele depth)/depth $< 0.2$
-			\item ref phred-scaled genotype posterior $< 20$
-			\item depth $< 10$
+			\item (Reference allele depth + alternative allele depth)/depth $< 0.8$
+			\item (Alternative allele depth)/depth $< 0.2$
+			\item Reference phred-scaled genotype posterior $< 20$
+			\item Depth $< 10$
 		\end{itemize}
-		\item If hom var, at least one of:
+		\item If homozygous variant, at least one of:
 		\begin{itemize}
-			\item (alt allele depth)/depth $< 0.8$
-			\item ref phred-scaled genotype posterior $< 20$
-			\item depth $< 10$
+			\item (Alternative allele depth)/depth $< 0.8$
+			\item Reference phred-scaled genotype posterior $< 20$
+			\item Depth $< 10$
 		\end{itemize}
     \end{itemize}
-    \item Using 02\_prefilter\_variants.py, Remove variants that either:
+    \item Using \href{https://github.com/astheeggeggs/BipEx/blob/master/scripts_Dalio/QC_Dalio/02_prefilter_variants.py}{02\_prefilter\_variants.py}, Remove variants that either:
     \begin{itemize}
-    	\item Did not fall in the target intervals
     	\item Fall in a low complexity region
-    	\item Have VQSLOD $< -8$
+    	\item Fail VQSR.
     \end{itemize}
-    \item Using 03\_initial\_sample\_qc.py, run `sample\_qc' using hail and remove (see Figure \ref{fig:initial_sample_qc}):
+    \item Using \href{https://github.com/astheeggeggs/BipEx/blob/master/scripts_Dalio/QC_Dalio/03_initial_sample_qc.py}{03\_initial\_sample\_qc.py}, run `sample\_qc' using hail and remove:
     \begin{itemize}
-    	\item sample call rate $< 0.9$
-    	\item FREEMIX contamination (\%?) $> 0.004$
-    	\item PCT\_CHIMERAS (\%?) $>  0.0015$
+    	\item sample call rate $< 0.94$
+    	\item FREEMIX contamination (\%) $> 0.002$
+    	\item PCT\_CHIMERAS (\%) $>  0.0015$
     	\item mean depth (dpMean) $< 30$
-    	\item mean genotype quality (gqMean) $< 82.5$
+    	\item mean genotype quality (gqMean) $< 85$
     \end{itemize}
-    Thresholds used were based on plotting the various distributions.
-    \item Export common variants (allele frequency between 0.01 to 0.99) with high call rate ($>0.98$) to plink format and prune to independent SNPs using `--indep 50 5 2'
-	\item Impute the sexes of the individuals (`05\_impute\_sex.py'; see Figure \ref{fig:impute_sex}) with this pruned set of variants on the X, and create list of samples with incorrect or unknown sex as defined by:
+    Thresholds used were based on plotting the various distributions. See Figure \ref{fig:initial_sample_qc} for CDFs and the thresholds used.
+    \item Export common variants (allele frequency between 0.01 to 0.99) with high call rate ($>0.98$) to plink format and prune to independent SNPs using `--indep 50 5 2' (\href{https://github.com/astheeggeggs/BipEx/blob/master/scripts_Dalio/QC_Dalio/04_export_plink.py}{04\_export\_plink.py}).
+	\item Impute the sexes of the individuals (\href{https://github.com/astheeggeggs/BipEx/blob/master/scripts_Dalio/QC_Dalio/05_impute_sex.py}{05\_impute\_sex.py}; see Figure \ref{fig:impute_sex}) with this pruned set of variants on the X, and create list of samples with incorrect or unknown sex as defined by:
 	\begin{itemize}
 		\item Sex is `unknown' in the phenotype files.
 		\item F-statistic $> 0.6$ and the sex is `female' in the phenotype file.
 		\item F-statistic $< 0.6$ and the sex is `male' in the phenotype file.
 		\item Currently I don't add individuals to this list based on number of calls in the Y - perhaps I should add this.
 	\end{itemize}
-	\item Compute IBD between all pairs of individuals using the pruned set of variants in the autosomes (`06\_ibd.py'; see Figure \ref{fig:IBD_plot}).
+	\item Compute IBD between all pairs of individuals using the pruned set of variants in the autosomes (\href{https://github.com/astheeggeggs/BipEx/blob/master/scripts_Dalio/QC_Dalio/06_ibd.py}{06\_ibd.py}; see Figure \ref{fig:IBD_plot}).
 		\begin{itemize}
-			\item Create sample list of individuals such that no pair has $\hat{\pi}>0.2$.
+			\item Create sample list of individuals such that no pair has $\hat{\pi}>0.2$ (\href{https://github.com/astheeggeggs/BipEx/blob/master/scripts_Dalio/QC_Dalio/06_ibd_filter.r}{06\_ibd\_filter.r}).
 		\end{itemize}
 	\item Run PCA on samples after removing relateds and those that passed initial QC, using the pruned set of variants (`09\_pca.py'; see Figure \ref{fig:PCA}).
-	\item Run PCA on samples plus all of 1000 genomes (`10\_pca\_1kg.py'; see Figure \ref{fig:PCA_1kg}).
+	\item Run PCA on samples plus all of 1000 genomes (\href{https://github.com/astheeggeggs/BipEx/blob/master/scripts_Dalio/QC_Dalio/10_pca_1kg.py}{10\_pca\_1kg.py} ; see Figure \ref{fig:PCA_1kg}).
 	\begin{itemize}
 		\item Train a random forest (500 trees) on the super populations of 1000 genomes and predict super populations of Dalio samples.
 		\item Denote strictly defined European subset as those with probability $> 0.9$ of being European according to the classifier. 
 	\end{itemize}
-	\item Run PCA on samples restricted to the strictly defined European subset, and check for outliers (`11\_pca\_EUR.py'; see Figure \ref{fig:PCA_EUR}).
-	\item Using a much looser definition of European, restrict to US samples from MGH and Johns Hopkins, and run PCA (`12\_pca\_.AJ.py'; see Figure \ref{fig:AJ_PCA})
+	\item Run PCA on samples restricted to the strictly defined European subset, and check for outliers (\href{https://github.com/astheeggeggs/BipEx/blob/master/scripts_Dalio/QC_Dalio/11_pca_EUR.py}{11\_pca\_EUR.py}; see Figure \ref{fig:PCA_EUR}).
+	\item Using a much looser definition of European, restrict to US samples from MGH and Johns Hopkins, and run PCA (\href{https://github.com/astheeggeggs/BipEx/blob/master/scripts_Dalio/QC_Dalio/12_pca_.AJ.py}{12\_pca\_.AJ.py}; see Figure \ref{fig:AJ_PCA})
 	\begin{itemize}
 		\item Identify Ashkenazi Jewish cluster, and create a list of outliers (AJ or otherwise) for downstream removal.
 	\end{itemize}
 	\item Run further PCA on:
 	\begin{enumerate}
-		\item Strictly defined Europeans and Ashkenazi Jews (`13\_pca\_AJ\_1kg.py'; see Figure \ref{fig:PCA_EUR_AJ_1kg}).
+		\item Strictly defined Europeans and Ashkenazi Jews (\href{https://github.com/astheeggeggs/BipEx/blob/master/scripts_Dalio/QC_Dalio/13_pca_AJ_1kg.py}{13\_pca\_AJ\_1kg.py}; see Figure \ref{fig:PCA_EUR_AJ_1kg}).
 		\begin{itemize}
 			\item Use Ashkenazi Jewish cluster to train a random forest and determine if there are further Ashkenazi Jews in the remainder of the dataset - there weren't.
 		\end{itemize} 
-		\item Strictly defined Europeans (`13\_pca\_EUR\_1kg.py'; see Figure \ref{fig:PCA_EUR_1kg})
-		\item Strictly defined Europeans, restricting to all but the Swedes (`13\_pca\_mainland\_EUR\_1kg.py'; see Figure \ref{fig:PCA_mainland_EUR_1kg}).
-		\item Strictly defined Europeans, restricting to the Swedes (`13\_pca\_SWE\_1kg.py'; see Figure \ref{fig:PCA_SWE_1kg}).
+		\item Strictly defined Europeans (\href{https://github.com/astheeggeggs/BipEx/blob/master/scripts_Dalio/QC_Dalio/13_pca_EUR_1kg.py}{13\_pca\_EUR\_1kg.py}; see Figure \ref{fig:PCA_EUR_1kg})
+		\item Strictly defined Europeans, restricting to all but the Swedes (\href{https://github.com/astheeggeggs/BipEx/blob/master/scripts_Dalio/QC_Dalio/13_pca_mainland_EUR_1kg.py}{13\_pca\_mainland\_EUR\_1kg.py}; see Figure \ref{fig:PCA_mainland_EUR_1kg}).
+		\item Strictly defined Europeans, restricting to the Swedes (\href{https://github.com/astheeggeggs/BipEx/blob/master/scripts_Dalio/QC_Dalio/13_pca_SWE_1kg.py}{13\_pca\_SWE\_1kg.py} ; see Figure \ref{fig:PCA_SWE_1kg}).
 	\end{enumerate}
 	\item Ended up not removing any samples here - was considering removing Finns.
-	\item Now restrict to samples in the strictly defined European subset, filter to the unrelated list, and filter out samples with incorrectly defined sex or unknown sex, and run variant QC (`15\_final\_variant\_qc.py'; see Figure \ref{fig:variant_QC}). Remove variants that satisfy at least one of:
+	\item Now restrict to samples in the strictly defined European subset, filter to the unrelated list, and filter out samples with incorrectly defined sex or unknown sex, and run variant QC (\href{https://github.com/astheeggeggs/BipEx/blob/master/scripts_Dalio/QC_Dalio/15_final_variant_qc.py}{15\_final\_variant\_qc.py} ; see Figure \ref{fig:variant_QC}). Remove variants that satisfy at least one of:
 	\begin{itemize}
 		\item Invariant site in cleaned sample subset.
 		\item Call rate $< 0.97$
@@ -130,7 +129,7 @@
 		\item Ratio of transitions to transversions
 	\end{itemize} 
 	lies more than three standard deviations away from the mean.
-	\item Export common (0.01 - 0.99) variants to plink format, prune and evaluate final principal components for downstream analysis, and save cleaned .vds files.
+	\item Export common (0.01 - 0.99) variants to plink format, prune and evaluate final principal components for downstream analysis, and save cleaned .mt files.
 	\item Run final PCA, pruning the cleaned set of variants and cleaned set of samples (see Figure \ref{fig:final_PCs}).
 \end{itemize}
 
@@ -272,8 +271,8 @@
 
 \begin{figure}
 \centering
-\subfloat{\includegraphics[width=0.5\textwidth]{15_callRate_cdf.jpg}}
-\subfloat{\includegraphics[width=0.5\textwidth]{15_callRate_diff.jpg}}\\
+\subfloat{\includegraphics[width=0.5\textwidth]{15_call_rate_cdf.jpg}}
+\subfloat{\includegraphics[width=0.5\textwidth]{15_call_rate_diff.jpg}}\\
 \subfloat{\includegraphics[width=0.5\textwidth]{15_pHWE.jpg}}
 \caption{Variant QC}
 \label{fig:variant_QC}

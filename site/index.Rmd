@@ -1,0 +1,17 @@
+---
+title: '<div><img src="bipex.svg" style="width:50px;height:50px;"/> BipEx: Bipolar Exomes</div>'
+output: 
+  html_document:
+    theme: united
+    highlight: tango
+    
+---
+
+<br>
+
+<div class="well">
+
+In this website and repository, we detail the collection of quality control steps and analyses applied to the BipEx collection of Bipolar exome cases and controls. Each step of the quality control pipeline is explained in detail and links to python code utilising the [hail](hail.is) software developed in the lab, and R code used to generate the plots that you see when clicking around the website. A latex document outlining the steps in the QC pipeline is [here](https://github.com/astheeggeggs/BipEx/blob/master/scripts_Dalio/QC_Dalio/QC_pipeline_writeup/pipeline_writeup.tex).
+<br>
+
+</div>

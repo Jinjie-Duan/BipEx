@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Quality control pipeline</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/united.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"><div><img src="bipex_white.svg" style="width:18px;height:18px;"/> BipEx: Bipolar Exomes</div></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="qc.html">QC</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/astheeggeggs/BipEx">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Quality control pipeline</h1>
+
+</div>
+
+
+<p>On this page we detail the quality control (QC) pipeline for for the BipEx dataset. Further plots, the underlying <a href="https://github.com/astheeggeggs/BipEx/tree/master/scripts_Dalio/QC_Dalio">code</a> and a <a href="https://github.com/astheeggeggs/BipEx/blob/master/scripts_Dalio/QC_Dalio/QC_pipeline_writeup/pipeline_writeup.tex">document</a> summarising the pipeline can be found on the BipEx github <a href="https://github.com/astheeggeggs/BipEx">repository</a>.</p>
+<p><br></p>
+<div id="initial-genotype-filtering" class="section level1">
+<h1>Initial genotype filtering</h1>
+<p>Our first step (after conversion of the joint called <code>.vcf</code> file to a hail matrix table) is to remove genotypes based on the following collection of criteria:</p>
+<ul>
+<li>If homozygous reference, remove if at least one of the following is true:
+<ul>
+<li>Reference allele depth divided by total depth <span class="math inline">\(&lt; 0.8\)</span></li>
+<li>Genotype quality <span class="math inline">\(&lt; 20\)</span></li>
+<li>Depth <span class="math inline">\(&lt; 10\)</span></li>
+</ul></li>
+<li>If heterozygous, at least one of the following is true:
+<ul>
+<li>(Reference allele depth + alternative allele depth) divided by total depth <span class="math inline">\(&lt; 0.8\)</span></li>
+<li>Alternative allele depth divided by total depth <span class="math inline">\(&lt; 0.2\)</span></li>
+<li>Reference phred-scaled genotype posterior <span class="math inline">\(&lt; 20\)</span></li>
+<li>Depth <span class="math inline">\(&lt; 10\)</span></li>
+</ul></li>
+<li>If homozygous variant, at least one of the following is true:
+<ul>
+<li>Alternative allele depth divided by total depth <span class="math inline">\(&lt; 0.2\)</span></li>
+<li>Reference phred-scaled genotype posterior <span class="math inline">\(&lt; 20\)</span></li>
+<li>Depth <span class="math inline">\(&lt; 10\)</span></li>
+</ul></li>
+</ul>
+<p><br></p>
+</div>
+<div id="initial-variant-filtering" class="section level1">
+<h1>Initial variant filtering</h1>
+<p>Remove variants that either:</p>
+<ul>
+<li>Fall in a low complexity region</li>
+<li>Fail VQSR</li>
+</ul>
+<p><br></p>
+</div>
+<div id="initial-sample-quality-control" class="section level1">
+<h1>Initial sample quality control</h1>
+<p>We run the sample_qc function in hail and remove samples according to the following:</p>
+<ul>
+<li>Sample call rate <span class="math inline">\(&lt; 0.94\)</span></li>
+<li>FREEMIX contamination (%) <span class="math inline">\(&gt; 0.002\)</span></li>
+<li>Percentage chimeras (%) <span class="math inline">\(&gt; 0.0015\)</span></li>
+<li>Mean depth <span class="math inline">\(&lt; 30\)</span></li>
+<li>Mean genotype quality <span class="math inline">\(&lt; 85\)</span></li>
+</ul>
+<p>Thresholds used were based on plotting the distributions of these metrics. A full collection of plots can be found in the <a href="https://github.com/astheeggeggs/BipEx/tree/master/QC_plots/sample_plots">repository</a>. Here we show boxplots with overlaid scatterplots of the above metrics, split by sequencing batch, and coloured by location. The threshold for exclusion is shown as a dashed line.</p>
+<p><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/03_callRate_by_batch.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/03_contamination_by_batch.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/03_chimeras_by_batch.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/03_dpMean_by_batch.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/03_gqMean_by_batch.jpg" width="100%" /></p>
+<p>Following this step, we export high quality variants (allele frequency between 0.01 to 0.99 with high call rate (&gt; 0.98)) to plink format and prune to pseudo-independent SNPs using <code>--indep 50 5 2</code>. This pruned set of SNPs feeds into the next few stages of the QC pipeline.</p>
+<p><br></p>
+</div>
+<div id="sex-imputation" class="section level1">
+<h1>Sex imputation</h1>
+<p>We impute the sexes of the individuals with this pruned set of variants on the X chromosome, and create list of samples with incorrect or unknown sex as defined by:</p>
+<ul>
+<li>Sex is unknown in the phenotype files</li>
+<li>F-statistic <span class="math inline">\(&gt; 0.6\)</span> and the sex is female in the phenotype file</li>
+<li>F-statistic <span class="math inline">\(&lt; 0.6\)</span> and the sex is male in the phenotype file</li>
+</ul>
+<p>Here we show the distribution of the F-statistic, with the <span class="math inline">\(0.6\)</span> threshold defining our sex impututation shown as a dashed line.</p>
+<p><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/05_imputesex_histogram.jpg" width="100%" /> <br></p>
+</div>
+<div id="ibd" class="section level1">
+<h1>IBD</h1>
+<p>Using the <code>identity_by_descent</code> method in hail, we evaluate <span class="math inline">\(\hat{\pi}\)</span> between pairs of samples, and filter based on a threshold of <span class="math inline">\(0.2\)</span> shown as a dashed line on the plot below.</p>
+<p><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/06_IBD_plot.jpg" width="100%" /></p>
+<p>We then create a sample list of patients such that no pair has <span class="math inline">\(\hat{\pi} &gt; 0.2\)</span>.</p>
+<p><br></p>
+</div>
+<div id="pca" class="section level1">
+<h1>PCA</h1>
+<p>We next perform a number of principal component analysis (PCA) steps to ensure that we have matched cases and controls in our cleaned dataset.</p>
+<p><br></p>
+<div id="initial-pca" class="section level2">
+<h2>Initial PCA</h2>
+<p>We first run PCA on samples after removing relateds and those that passed initial QC, using the pruned set of variants.</p>
+<p><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/09_PC1_PC2_collection.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/09_PC3_PC4_collection.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/09_PC5_PC6_collection.jpg" width="100%" /></p>
+<p><br></p>
+</div>
+<div id="pca-including-1000-genomes" class="section level2">
+<h2>PCA including 1000 genomes</h2>
+<p>Next, we included the 1000 genomes samples (minus the small subset of related individuals within 1000 geneomes), and rerun PCA after including those individuals. Plots of the first six principal components are shown below. 1000 genomes samples are coloured in dark blue.</p>
+<p><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/10_PC1_PC2_1kg_collection.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/10_PC3_PC4_1kg_collection.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/10_PC5_PC6_1kg_collection.jpg" width="100%" /></p>
+<p>We restrict to the European subset of individuals to perform analysis. To do this, we train a random forest on the super populations labels of 1000 genomes and predict the super population that each of the BipEx samples. We denote strictly defined European subset as those with probability <span class="math inline">\(&gt; 0.9\)</span> of being European according to the classifier. BipEx samples are coloured by their assignment or unsure if none of the classifier probabilities exceeded <span class="math inline">\(0.9\)</span> in the following plots.</p>
+<p><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/10_PC1_PC2_classify_EUR_strict.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/10_PC3_PC4_classify_EUR_strict.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/10_PC5_PC6_classify_EUR_strict.jpg" width="100%" /></p>
+<p>Samples not assigned to the European cluster were removed from downstream analysis.</p>
+<p>In addition, using a much looser definition of European, we restrict to US samples from MGH and Johns Hopkins, and run PCA. This enabled us to identify Ashkenazi Jewish clusters, and create a list of outliers (AJ or otherwise) for downstream removal or independent analysis.</p>
+<p>Run also ran a further collection of PCAs on:</p>
+<ul>
+<li>Strictly defined Europeans and Ashkenazi Jewish individuals
+<ul>
+<li>Use Ashkenazi Jewish cluster to train a random forest and determine if there are further Ashkenazi Jews in the remainder of the dataset.</li>
+</ul></li>
+<li>Strictly defined Europeans</li>
+<li>Strictly defined Europeans, restricting to all but Swedes</li>
+<li>Strictly defined Europeans, restricting to the Swedes</li>
+</ul>
+<p>However, upon restriction to the European cluster and after removal of AJs, we find that we have a dense case-control matched collection of samples and so decide not to analyse Swedes, Finns and Europeans (excluding Finns and Swedes) separately.</p>
+<p><br></p>
+</div>
+</div>
+<div id="final-variant-filtering" class="section level1">
+<h1>Final variant filtering</h1>
+<p>For our final variant filtering step, we first restrict to samples in the strictly defined European subset, filter to the unrelated list, and filter out samples with incorrectly defined sex or unknown sex, and run variant QC. We then evaluate a collection of variant metrics and remove variants that satisfy at least one of:</p>
+<ul>
+<li>Invariant site in cleaned sample subset</li>
+<li>Call rate <span class="math inline">\(&lt; 0.97\)</span></li>
+<li>Control call rate <span class="math inline">\(&lt; 0.97\)</span></li>
+<li>Case call rate <span class="math inline">\(&lt; 0.97\)</span></li>
+<li><span class="math inline">\(|\)</span>Case call rate - Control call rate<span class="math inline">\(| &gt; 0.02\)</span></li>
+<li><span class="math inline">\(p\)</span>-value for Hardy Weinberg Equilibrium <span class="math inline">\(&lt; 10^{−6}\)</span></li>
+</ul>
+<p>The following plots show the <span class="math inline">\(0.97\)</span> threshold for call rate and <span class="math inline">\(0.02\)</span> threshold for difference in call rate between cases and controls respectively.</p>
+<p><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/15_call_rate_cdf.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/15_call_rate_diff.jpg" width="100%" /></p>
+<p>After these steps we plot the resulting changes in metrics across the samples in our data set. Each of the following plots splits the data by sequencing data and colours the points based on location. The first collection of subplots in each figure shows the variant metrics before sample removal, with the lower collection of subplots showing the resultant change after our QC steps.</p>
+<p><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/16_nSingletonsbyBatchColLocation.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/16_rHetHomVarbyBatchColLocation.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/16_rInsertionDeletionbyBatchColLocation.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/16_rTiTvbyBatchColLocation.jpg" width="100%" /></p>
+<p><br></p>
+</div>
+<div id="final-sample-filtering" class="section level1">
+<h1>Final sample filtering</h1>
+<p>In this step we remove sample outliers after the variant cleaning in the previous step. Samples are removed if at least on of the following lies more that three standard deviations away from the mean:</p>
+<ul>
+<li>Ratio of heterozygous to homozygous variant</li>
+<li>Ratio of insertions to deletions</li>
+<li>Ratio of transitions to transversions</li>
+</ul>
+<p>As a final step, we export common (allele frequency between <span class="math inline">\(0.01\)</span> and <span class="math inline">\(0.99\)</span>) variants to plink format, prune, and evaluate final principal components for downstream analysis. The first six principal components are displayed below and coloured by case status.</p>
+<p><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/18_PC1_PC2_final_PCs.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/18_PC3_PC4_final_PCs.jpg" width="100%" /><img src="/Users/duncan/Repositories/BipEx/QC_plots/sample_plots/18_PC5_PC6_final_PCs.jpg" width="100%" /></p>
+<p><br></p>
+<p>After all of this data cleaning, we save the resultant hail matrix tables for downstream analyses.</p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
