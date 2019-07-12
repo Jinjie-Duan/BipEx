@@ -6,6 +6,7 @@ library(data.table)
 # Get thresholds and file locations.
 source("r_functions_and_parameters/r_options_Dalio.r")
 
+IBD_FILE <- "gsutil cat gs://dalio_bipolar_w1_w2_hail_02/data/samples/06_ibd.tsv"
 df <- fread(IBD_FILE, sep='\t', stringsAsFactors=TRUE, header=TRUE, data.table=FALSE)
 
 df$inferred_relationship <- 'Siblings'

@@ -5,8 +5,8 @@ from hail.plot import show
 from pprint import pprint
 hl.plot.output_notebook()
 
-MT_HARDCALLS = 'gs://raw_data_bipolar_dalio_w1_w2_hail_02/bipolar_wes_dalio_W1_W2/filterGT.hardcalls.mt'
-PCA_SCORES_USA = 'gs://dalio_bipolar_w1_w2_hail_02/data/samples/12_pca_scores_MGH_JH_samples.tsv'
+MT_HARDCALLS = 'gs://raw_data_bipolar_dalio_w1_w2_hail_02/bipolar_wes_dalio_W1_W2/filterGT_GRCh38_6_multi.hardcalls.mt'
+PCA_SCORES_USA = 'gs://dalio_bipolar_w1_w2_hail_02/data/samples/12_pca_scores_USA_samples.tsv'
 
 PHENOTYPES_TABLE = 'gs://dalio_bipolar_w1_w2_hail_02/data/samples/phenotypes.ht'
 INITIAL_SAMPLES = 'gs://dalio_bipolar_w1_w2_hail_02/data/samples/03_initial_qc.keep.sample_list'
@@ -18,7 +18,6 @@ IBD_SAMPLES = 'gs://dalio_bipolar_w1_w2_hail_02/data/samples/06_ibd.remove.sampl
 EUROPEAN_SAMPLES_LOOSE = 'gs://dalio_bipolar_w1_w2_hail_02/data/samples/10_european.loose.sample_list'
 
 # We then further restrict to the US samples within this.
-
 mt = hl.read_matrix_table(MT_HARDCALLS)
 sample_annotations = hl.read_table(PHENOTYPES_TABLE)
 
@@ -27,7 +26,7 @@ ht_pruned_variants = hl.import_table(PRUNED_VARIANTS, no_header=True)
 ht_ibd_samples = hl.import_table(IBD_SAMPLES, no_header=True, key='f0')
 ht_eur_samples_loose = hl.import_table(EUROPEAN_SAMPLES_LOOSE, no_header=True, key='f0')
 
-ht_pruned_variants = ht_pruned_variants.annotate(**hl.parse_variant(ht_pruned_variants.f0))
+ht_pruned_variants = ht_pruned_variants.annotate(**hl.parse_variant(ht_pruned_variants.f0, reference_genome='GRCh38'))
 ht_pruned_variants = ht_pruned_variants.key_by(ht_pruned_variants.locus, ht_pruned_variants.alleles)
 
 mt = mt.filter_cols(hl.is_defined(ht_initial_samples[mt.col_key]))
@@ -37,13 +36,13 @@ mt = mt.filter_rows(hl.is_defined(ht_pruned_variants[mt.row_key]))
 mt = mt.annotate_cols(phenotype = sample_annotations[mt.s])
 mt = mt.filter_cols(hl.is_defined(ht_eur_samples_loose[mt.col_key]))
 
-mt = mt.filter_cols((mt.phenotype.Location == "USA, MGH") | (mt.phenotype.Location == "USE, Johns Hopkins"))
+mt = mt.filter_cols((mt.phenotype.LOCATION == "Boston, USA") | (mt.phenotype.LOCATION== "Baltimore, USA"))
 
 n = mt.count()
 
-print('nSamples:')
+print('n samples:')
 print(n[1])
-print('nVariants:')
+print('n variants:')
 print(n[0])
 
 pca_output = hl.hwe_normalized_pca(mt.GT, k=10)

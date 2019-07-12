@@ -5,7 +5,7 @@ from hail.plot import show
 from pprint import pprint
 hl.plot.output_notebook()
 
-MT = 'gs://raw_data_bipolar_dalio_w1_w2_hail_02/bipolar_wes_dalio_W1_W2/filterGT.mt'
+MT = 'gs://raw_data_bipolar_dalio_w1_w2_hail_02/bipolar_wes_dalio_W1_W2/filterGT_GRCh38_6_multi.mt'
 
 PHENOTYPES_TABLE = 'gs://dalio_bipolar_w1_w2_hail_02/data/samples/phenotypes.ht'
 IMPUTESEX_TABLE = 'gs://dalio_bipolar_w1_w2_hail_02/data/samples/05_imputesex.ht'
@@ -17,10 +17,14 @@ IMPUTESEX_TABLE = 'gs://dalio_bipolar_w1_w2_hail_02/data/samples/05_imputesex.ht
 # Also, need to ensure that the AJ samples used to train are also removed.
 
 PCA_LIST = 'gs://dalio_bipolar_w1_w2_hail_02/data/samples/12_european.sample_list'
-AJ_CLASSIFY_LIST = 'gs://dalio_bipolar_w1_w2_hail_02/data/samples/13_AJ_classify.sample_list'
+# These are the AJs that are classified using the AJs from the US samples.
+AJ_CLASSIFY_LIST = 'gs://dalio_bipolar_w1_w2_hail_02/data/samples/13_aj_classify.sample_list'
+# These are the samples that we identify as AJ in the US samples.
+AJ_LIST = 'gs://dalio_bipolar_w1_w2_hail_02/data/samples/12_aj.sample_list'
+
 IBD_SAMPLES = 'gs://dalio_bipolar_w1_w2_hail_02/data/samples/06_ibd.remove.sample_list'
 
-VARIANT_QC_FILE = 'gs://dalio_bipolar_w1_w2_hail_02/data/variants/15_final_qc.variants.tsv.bgz'
+VARIANT_QC_FILE = 'gs://dalio_bipolar_w1_w2_hail_02/data/variants/14_final_qc.variants.tsv.bgz'
 INITIAL_VARIANT_LIST = 'gs://dalio_bipolar_w1_w2_hail_02/data/variants/02_prefilter.keep.variant_list'
 
 sample_annotations = hl.read_table(PHENOTYPES_TABLE)
@@ -28,19 +32,19 @@ impute_sex_annotations = hl.read_table(IMPUTESEX_TABLE)
 
 # This is empty - uncomment if it's not.
 # ht_aj_samples = hl.import_table(AJ_CLASSIFY_LIST, no_header=True, key='f0')
+ht_aj_samples = hl.import_table(AJ_LIST, no_header=True, key='f0')
 ht_pca_samples = hl.import_table(PCA_LIST, no_header=True, key='f0')
 ht_ibd_samples = hl.import_table(IBD_SAMPLES, no_header=True, key='f0')
 
 ht_initial_variants = hl.import_table(INITIAL_VARIANT_LIST,
-	types={'locus':hl.tlocus(), 'alleles':hl.tarray(hl.tstr)})
+	types={'locus':hl.tlocus(reference_genome='GRCh38'), 'alleles':hl.tarray(hl.tstr)})
 
 ht_initial_variants = ht_initial_variants.key_by(ht_initial_variants.locus, ht_initial_variants.alleles)
 
 mt = hl.read_matrix_table(MT)
 
 mt = mt.filter_cols(hl.is_defined(ht_pca_samples[mt.col_key]))
-# This is empty - uncomment if it's not
-# mt = mt.filter_cols(hl.is_defined(ht_aj_samples[mt.col_key]))
+mt = mt.filter_cols(~hl.is_defined(ht_aj_samples[mt.col_key]))
 mt = mt.filter_cols(~hl.is_defined(ht_ibd_samples[mt.col_key]))
 mt = mt.filter_rows(hl.is_defined(ht_initial_variants[mt.row_key]))
 
@@ -68,15 +72,15 @@ mt = mt.annotate_rows(qc = mt.qc.annotate(p_value_hwe = hl.case()
 
 n = mt.count()
 
-print('nSamples:')
+print('n samples:')
 print(n[1])
-print('nVariants:')
+print('n variants:')
 print(n[0])
 
 # Want to compare the average quality of variants in cases and controls, and compare them.
 # We also want to compare the quality of the variants across the different locations.
 
-mt_control = mt.filter_cols(mt.phenotype.Phenotype == "Control")
+mt_control = mt.filter_cols(mt.phenotype.PHENOTYPE_COARSE == "Control")
 mt_control = hl.variant_qc(mt_control, name = 'qc')
 
 mt_control = mt_control.annotate_rows(
@@ -92,12 +96,12 @@ mt_control = mt_control.annotate_rows(qc = mt_control.qc.annotate(p_value_hwe = 
 
 n = mt_control.count()
 
-print('nSamples:')
+print('n samples:')
 print(n[1])
-print('nVariants:')
+print('n variants:')
 print(n[0])
 
-mt_case = mt.filter_cols(mt.phenotype.Phenotype == "Bipolar Disorder")
+mt_case = mt.filter_cols(mt.phenotype.PHENOTYPE_COARSE == "Bipolar Disorder")
 mt_case = hl.variant_qc(mt_case, name='qc')
 
 mt_case = mt_case.annotate_rows(
@@ -113,9 +117,9 @@ mt_case = mt_case.annotate_rows(qc = mt_case.qc.annotate(p_value_hwe = hl.case()
 
 n = mt_case.count()
 
-print('nSamples:')
+print('n samples:')
 print(n[1])
-print('nVariants:')
+print('n variants:')
 print(n[0])
 
 # Finally, annotate the larger matrix table with this information, and export.

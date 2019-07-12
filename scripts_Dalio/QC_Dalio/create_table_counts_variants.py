@@ -5,10 +5,28 @@ from hail.plot import show
 from pprint import pprint
 hl.plot.output_notebook()
 
-# Names of .mt files.
+# 01_load_vcf_filterGT.py
+
+RAW_MT = 'gs://raw_data_bipolar_dalio_w1_w2_hail_02/dalio_bipolar_w1_w2/Dalio_W1_W2_GRCh38_exomes.mt'
+mt = hl.read_matrix_table(RAW_MT)
+
+# Initial count.
+n_raw = mt.count_rows()
+
+print('Initial number of variants:')
+pprint(n_raw)
+
+# Number with less that or equal to 6 alleles.
 MT_HARDCALLS = 'gs://raw_data_bipolar_dalio_w1_w2_hail_02/bipolar_wes_dalio_W1_W2/filterGT_GRCh38_6_multi.hardcalls.mt'
-# Read in the hard calls matrix table.
 mt = hl.read_matrix_table(MT_HARDCALLS)
+n_6_multi = mt.count_rows()
+
+print('n variants with <= 6 alleles:')
+pprint(n_6_multi)
+
+# 02_prefilter_variants.py
+INITIAL_VARIANT_LIST = 'gs://dalio_bipolar_w1_w2_hail_02/data/variants/02_prefilter.keep.variant_list'
+INITIAL_VARIANT_QC_FILE  = 'gs://dalio_bipolar_w1_w2_hail_02/data/variants/02_prefilter_metrics.tsv'
 
 # Read in the target intervals
 TARGET_INTERVALS = 'gs://raw_data_bipolar_dalio_w1_w2_hail_02/inputs/ice_coding_v1_targets.interval_list'
@@ -17,9 +35,6 @@ PADDED_TARGET_INTERVALS = 'gs://raw_data_bipolar_dalio_w1_w2_hail_02/inputs/ice_
 
 # Low complexity regions in the data.
 LCRs = 'gs://raw_data_bipolar_dalio_w1_w2_hail_02/inputs/LCR-hs38.bed'
-
-INITIAL_VARIANT_QC_FILE  = 'gs://dalio_bipolar_w1_w2_hail_02/data/variants/02_prefilter_metrics.tsv'
-INITIAL_VARIANT_LIST = 'gs://dalio_bipolar_w1_w2_hail_02/data/variants/02_prefilter.keep.variant_list'
 
 # Import the interval lists for the target intervals.
 target_intervals = hl.import_locus_intervals(TARGET_INTERVALS, reference_genome='GRCh38')
@@ -44,26 +59,40 @@ print('n variants failing VQSR:')
 pprint(fail_VQSR)
 print('n variants in low complexity regions:')
 pprint(in_LCR)
-print('n variants not in target intervals:')
-pprint(not_in_target_intervals)
 print('n variants not in padded target intervals:')
 pprint(not_in_padded_target_intervals)
 
-# Export variant annotations, and variant keytable.
+# Filter to variants in the autosomes, chrX and Y.
 mt_rows = mt.rows()
-mt_rows.select(mt_rows.fail_VQSR, mt_rows.in_LCR, mt_rows.not_in_padded_target_intervals).export(INITIAL_VARIANT_QC_FILE)
 mt = mt.filter_rows(mt.fail_VQSR | mt.in_LCR | mt.not_in_padded_target_intervals, keep=False)
 
 intervals = [hl.parse_locus_interval(x, reference_genome='GRCh38') for x in ['chr1:START-chr22:END', 'chrX:START-chrX:END', 'chrY:START-chrY:END']]
+n_after_filter = mt.count_rows()
+
 mt = hl.filter_intervals(mt, intervals)
 
-# Filter out the invariant rows.
-mt = hl.variant_qc(mt, name='qc')
-mt = mt.filter_rows((mt.qc.AF[0] > 0.0) & (mt.qc.AF[0] < 1.0))
+n_in_chr = mt.count_rows()
+print('n variants in autosomes, chrX, chrY:')
+pprint(n_in_chr)
 
-mt_rows_filter = mt.rows().select().export(INITIAL_VARIANT_LIST)
+print('n variants removed in contigs outside autosomes, X and Y:')
+pprint(n_after_filter - n_in_chr)
 
-n_variants = hl.import_table(INITIAL_VARIANT_LIST).count()
+# Filter to variants in the autosomes, chrX and Y.
+n_initial_variant_list = hl.import_table(INITIAL_VARIANT_LIST).count()
+print('Invariant sites after initial variant and genotype filters:')
+pprint(n_initial_variant_list)
 
-print('n variants after initial filter:')
-print(n_variants)
+# Create an initial markdown table
+with hl.hadoop_open('gs://dalio_bipolar_w1_w2_hail_02/data/summary_variant_table.tsv', 'w') as f:
+	f.write(hl.eval('Initial variants\t' + hl.str(n_raw) + '\n'))
+	f.write(hl.eval('Variants with > 6 alleles\t' + hl.str(n_6_multi) + '\n'))
+	f.write(hl.eval('Failing VQSR\t' + hl.str(fail_VQSR) + '\n'))
+	f.write(hl.eval('In LCRs\t' + hl.str(in_LCR) + '\n'))
+	f.write(hl.eval('Outside padded target interval\t' + hl.str(not_in_padded_target_intervals) + '\n'))
+	f.write(hl.eval('Variants after initial filter\t' + hl.str(n_after_filter) + '\n'))
+	f.write(hl.eval('Variants in contigs outside autosomes, X and Y\t' + hl.str(n_after_filter - n_in_chr) + '\n'))
+	f.write(hl.eval('Invariant sites after initial variant and genotype filters\t' + hl.str(n_initial_variant_list) + '\n'))
+
+
+

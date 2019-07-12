@@ -15,6 +15,9 @@ save_figures <- TRUE
 perform_plotting <- TRUE
 creating_new_EUR_def <- TRUE
 
+PCA_SCORES <- 'gsutil cat gs://dalio_bipolar_w1_w2_hail_02/data/samples/09_pca_scores.tsv'
+PCA_1KG_SCORES <- 'gsutil cat gs://dalio_bipolar_w1_w2_hail_02/data/samples/10_pca_scores_1kg.tsv'
+
 df_PCs <- fread(PCA_SCORES, sep='\t', stringsAsFactors=FALSE, header=TRUE, data.table=FALSE)
 df_URVs <- fread(URV_FILE, sep='\t', stringsAsFactors=FALSE, header=TRUE, data.table=FALSE)
 names(df_URVs)[names(df_URVs) == 'Samples'] <- 'sample'
@@ -25,7 +28,7 @@ PCs <- c(1,3,5)
 
 if (perform_plotting) {
     for (i in PCs) {
-        aes <- aes_string(x=paste0('PC',i), y=paste0('PC',i+1), color='phenotype.Phenotype')
+        aes <- aes_string(x=paste0('PC',i), y=paste0('PC',i+1), color='phenotype.PHENOTYPE_COARSE')
         p <- create_pretty_scatter(df, aes, save_figure=save_figures, file=paste0(PLOTS,'09_PC',i,'_PC',i+1),
           n_x_ticks=5, x_label=paste0('Principal Component ',i), y_label=paste0('Principal Component ', i+1))
         p <- p + geom_point(data=df %>% filter(n_URV_SNP > T_nURVSNP | n_URV_indel > T_nURVIndel),
@@ -35,35 +38,35 @@ if (perform_plotting) {
         if(save_figures) {
             ggsave(paste0(PLOTS,'09_PC',i,'_PC',i+1, '_and_URV_marked.jpg'), p, width=144, height=96, units='mm')
         }
-        aes <- aes_string(x=paste0('PC',i), y=paste0('PC',i+1), color='phenotype.batch')
+        aes <- aes_string(x=paste0('PC',i), y=paste0('PC',i+1), color='phenotype.PROJECT_OR_COHORT')
         create_pretty_scatter(df, aes, save_figure=save_figures, file=paste0(PLOTS,'09_PC',i,'_PC',i+1, '_batch'), n_x_ticks=5,
           x_label=paste0('Principal Component ',i), y_label=paste0('Principal Component ', i+1))
-        aes <- aes_string(x=paste0('PC',i), y=paste0('PC',i+1), color='phenotype.Location')
+        aes <- aes_string(x=paste0('PC',i), y=paste0('PC',i+1), color='phenotype.LOCATION')
         create_pretty_scatter(df, aes, save_figure=save_figures, file=paste0(PLOTS,'09_PC',i,'_PC',i+1, '_collection'), n_x_ticks=5,
           x_label=paste0('Principal Component ',i), y_label=paste0('Principal Component ', i+1))
     }
 }
 
 df_1kg <- fread(PCA_1KG_SCORES, sep='\t', stringsAsFactors=FALSE, header=TRUE, data.table=FALSE) %>%
-    mutate(super_population = factor(super_population))
+    mutate(SUPER_POPULATION = factor(SUPER_POPULATION))
 df_1kg <- df_1kg[sample(nrow(df_1kg), replace=FALSE),]
 df_1kg <- merge(df_1kg, df_URVs, all.x=TRUE)
 
 if (perform_plotting) {
     for (i in PCs) {
-        aes <- aes_string(x=paste0('PC', i), y=paste0('PC', i+1), color='super_population')
+        aes <- aes_string(x=paste0('PC', i), y=paste0('PC', i+1), color='SUPER_POPULATION')
         p <- create_pretty_scatter(df_1kg, aes, #limits=c('Control', 'Bipolar Disorder', 'AFR', 'AMR', 'EAS', 'EUR', 'SAS'),
           add_final_layer=FALSE, #final_layer=subset(df_1kg, Phenotype == 'Bipolar Disorder' | Phenotype=='Control'),
           save_figure=save_figures, file=paste0(PLOTS,'10_PC',i,'_PC',i+1, '_1kg'), n_x_ticks=5,
           x_label=paste0('Principal Component ',i), y_label=paste0('Principal Component ', i+1))
 
-        aes <- aes_string(x=paste0('PC', i), y=paste0('PC', i+1), color='Batch')
+        aes <- aes_string(x=paste0('PC', i), y=paste0('PC', i+1), color='PROJECT_OR_COHORT')
         create_pretty_scatter(df_1kg, aes, add_final_layer=FALSE,
           # final_layer=subset(df_1kg, Phenotype == 'Bipolar Disorder' | Phenotype=='Control'),
           save_figure=save_figures, file=paste0(PLOTS,'10_PC',i,'_PC',i+1,'_1kg_batch'), n_x_ticks=5,
           x_label=paste0('Principal Component ',i), y_label=paste0('Principal Component ', i+1))
 
-        aes <- aes_string(x=paste0('PC', i), y=paste0('PC', i+1), color='Location')
+        aes <- aes_string(x=paste0('PC', i), y=paste0('PC', i+1), color='LOCATION')
         p <- create_pretty_scatter(df_1kg, aes, add_final_layer=FALSE,
           # final_layer=subset(df_1kg, Phenotype == 'Bipolar Disorder' | Phenotype=='Control'),
           save_figure=save_figures, file=paste0(PLOTS,'10_PC',i,'_PC',i+1,'_1kg_collection'), n_x_ticks=5,
@@ -71,27 +74,25 @@ if (perform_plotting) {
     }
 }
 
-# This step removes the 1KG samples that have relateds.
-df_1kg <- df_1kg %>% filter(!is.na(super_population))
 
-df_train = filter(df_1kg, case_control=='1KG') %>%
-  select(c(super_population, population, PC1, PC2, PC3, PC4, PC5, PC6, PC7, PC8, PC9, PC10))
+df_train = filter(df_1kg, PHENOTYPE_COARSE=='1KG') %>%
+  select(c(SUPER_POPULATION, POPULATION, PC1, PC2, PC3, PC4, PC5, PC6, PC7, PC8, PC9, PC10))
 
-df_predict = filter(df_1kg, case_control!='1KG') %>%
-  select(c(s, population, PC1, PC2, PC3, PC4, PC5, PC6, PC7, PC8, PC9, PC10))
+df_predict = filter(df_1kg, PHENOTYPE_COARSE!='1KG') %>%
+  select(c(s, POPULATION, PC1, PC2, PC3, PC4, PC5, PC6, PC7, PC8, PC9, PC10))
 
 PCs_to_use <- paste0('PC', seq(1,4))
 
 # Determine a classifier.
 set.seed(160487)
-rf <- randomForest(x=df_train[PCs_to_use], y=as.factor(as.character(df_train$super_population)), ntree=10000)
+rf <- randomForest(x=df_train[PCs_to_use], y=as.factor(as.character(df_train$SUPER_POPULATION)), ntree=10000)
 rf_probs <- predict(rf, df_predict[PCs_to_use], type='prob')
 
 check_thres <- function(row, threshold) {
   return(!any(row > threshold))
 }
 
-unsure <- apply(rf_probs, 1, check_thres, 0.95)
+unsure <- apply(rf_probs, 1, check_thres, T_European_RF)
 classification <- as.character(predict(rf, df_predict[PCs_to_use]))
 df_predict$classification_loose <- as.factor(classification)
 classification[unsure] <- 'unsure'
@@ -116,7 +117,7 @@ if (perform_plotting) {
             p <- create_pretty_scatter(df_classify, aes,
               save_figure=save_figures, file=paste0(PLOTS,'10_PC',i,'_PC',i+1,'_classify_EUR_loose'), n_x_ticks=5,
               x_label=paste0('Principal Component ',i), y_label=paste0('Principal Component ', i+1))
-            p <- p + geom_point(data=df_1kg %>% filter(super_population == "EUR"),
+            p <- p + geom_point(data=df_1kg %>% filter(SUPER_POPULATION == "EUR"),
               mapping=aes_string(x=paste0('PC',i), y=paste0('PC',i+1)),
               inherit.aes=FALSE, shape=4, show.legend=FALSE)
             print(p)
@@ -135,8 +136,8 @@ if (creating_new_EUR_def) {
     df_out_classify_loose <- df_classify %>% filter(classification_loose == 'EUR') %>% select(s)
 
     # The number of non-European samples
-    print(table((df_classify %>% filter(classification_strict != 'EUR'))$phenotype.Phenotype))
-    print(table((df_classify %>% filter(classification_loose != 'EUR'))$phenotype.Phenotype))
+    print(table((df_classify %>% filter(classification_strict != 'EUR'))$phenotype.PHENOTYPE_COARSE))
+    print(table((df_classify %>% filter(classification_loose != 'EUR'))$phenotype.PHENOTYPE_COARSE))
 
     # Print the number of remaining samples.
     print(paste0("Number of European samples using strict classifier: ", dim(df_out_classify_strict)[1]))
@@ -147,6 +148,20 @@ if (creating_new_EUR_def) {
     fwrite(df_out_classify_loose, file = EUROPEAN_SAMPLES_LOOSE, quote=FALSE, row.names=FALSE, col.names=FALSE)
 }
 
+# Count the number of samples in the strict and non-strict European subset
+df_strict <- fread(EUROPEAN_SAMPLES_STRICT, header=FALSE)
+df_loose <- fread(EUROPEAN_SAMPLES_LOOSE, header=FALSE)
+
+df_sample_PCs <- data.table(Filter = c("Initial samples",
+                          "Non-European, strict filter",
+                          "Non-European, loose filter",
+                          "Samples after strict European filter"),
+                     Samples = c(nrow(df_PCs),
+                              nrow(df_PCs) - nrow(df_strict),
+                              nrow(df_PCs) - nrow(df_loose),
+                              nrow(df_strict)))
+
+fwrite(df_sample_PCs, file='../../samples_Dalio/10_sample_count.tsv', quote=FALSE, row.names=FALSE, col.names=FALSE, sep='\t')
 
 # Plotting Ultra rare variants against PCs, *before* removal of outliers.
 

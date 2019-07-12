@@ -5,7 +5,7 @@ from hail.plot import show
 from pprint import pprint
 hl.plot.output_notebook()
 
-MT_HARDCALLS = 'gs://raw_data_bipolar_dalio_w1_w2_hail_02/bipolar_wes_dalio_W1_W2/filterGT.hardcalls.mt'
+MT_HARDCALLS = 'gs://raw_data_bipolar_dalio_w1_w2_hail_02/bipolar_wes_dalio_W1_W2/filterGT_GRCh38_6_multi.hardcalls.mt'
 PCA_SCORES_EUR = 'gs://dalio_bipolar_w1_w2_hail_02/data/samples/11_pca_scores.strict_european.tsv'
 
 PHENOTYPES_TABLE = 'gs://dalio_bipolar_w1_w2_hail_02/data/samples/phenotypes.ht'
@@ -25,7 +25,7 @@ ht_pruned_variants = hl.import_table(PRUNED_VARIANTS, no_header=True)
 ht_ibd_samples = hl.import_table(IBD_SAMPLES, no_header=True, key='f0')
 ht_eur_samples_strict = hl.import_table(EUROPEAN_SAMPLES_STRICT, no_header=True, key='f0')
 
-ht_pruned_variants = ht_pruned_variants.annotate(**hl.parse_variant(ht_pruned_variants.f0))
+ht_pruned_variants = ht_pruned_variants.annotate(**hl.parse_variant(ht_pruned_variants.f0,  reference_genome='GRCh38'))
 ht_pruned_variants = ht_pruned_variants.key_by(ht_pruned_variants.locus, ht_pruned_variants.alleles)
 
 mt = mt.filter_cols(hl.is_defined(ht_initial_samples[mt.col_key]))
@@ -37,9 +37,9 @@ mt = mt.filter_cols(hl.is_defined(ht_eur_samples_strict[mt.col_key]))
 
 n = mt.count()
 
-print('nSamples:')
+print('n samples:')
 print(n[1])
-print('nVariants:')
+print('n variants:')
 print(n[0])
 
 pca_output = hl.hwe_normalized_pca(mt.GT, k=10)

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /stanley/genetics/analysis/bipolar_dalio/plink/pruned
+cd /stanley/genetics/analysis/bipolar_dalio/plink_b38/pruned
 cat 04_chr1.prune.in 04_chr2.prune.in > 04_prune.keep.variant_list_tmp
 
 for i in `seq 3 22`;

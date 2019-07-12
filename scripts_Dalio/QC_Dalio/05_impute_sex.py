@@ -5,7 +5,7 @@ from hail.plot import show
 from pprint import pprint
 hl.plot.output_notebook()
 
-MT_HARDCALLS = 'gs://raw_data_bipolar_dalio_w1_w2_hail_02/bipolar_wes_dalio_W1_W2/filterGT.hardcalls.mt'
+MT_HARDCALLS = 'gs://raw_data_bipolar_dalio_w1_w2_hail_02/bipolar_wes_dalio_W1_W2/filterGT_GRCh38_6_multi.hardcalls.mt'
 
 IMPUTESEX_TABLE = 'gs://dalio_bipolar_w1_w2_hail_02/data/samples/05_imputesex.ht'
 IMPUTESEX_FILE = 'gs://dalio_bipolar_w1_w2_hail_02/data/samples/05_imputesex.tsv'
@@ -20,7 +20,7 @@ ht_initial_samples = hl.import_table(INITIAL_SAMPLES, no_header=True, key='f0')
 ht_pruned_chrx_variants = hl.import_table(PRUNED_CHRX_VARIANTS, no_header=True)
 sample_annotations = hl.read_table(PHENOTYPES_TABLE)
 
-ht_pruned_chrx_variants = ht_pruned_chrx_variants.annotate(**hl.parse_variant(ht_pruned_chrx_variants.f0))
+ht_pruned_chrx_variants = ht_pruned_chrx_variants.annotate(**hl.parse_variant(ht_pruned_chrx_variants.f0, reference_genome='GRCh38'))
 ht_pruned_chrx_variants = ht_pruned_chrx_variants.key_by(ht_pruned_chrx_variants.locus, ht_pruned_chrx_variants.alleles)
 
 mt = hl.read_matrix_table(MT_HARDCALLS)
@@ -29,9 +29,9 @@ mt = mt.filter_rows(hl.is_defined(ht_pruned_chrx_variants[mt.row_key]))
 
 n = mt.count()
 
-print('nSamples:')
+print('n samples:')
 print(n[1])
-print('nVariants:')
+print('n variants:')
 print(n[0])
 
 imputed_sex = hl.impute_sex(mt.GT, female_threshold=0.6, male_threshold=0.6)
