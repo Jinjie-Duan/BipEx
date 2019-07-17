@@ -46,7 +46,7 @@ fwrite(dt_loc, file="../phenotype_data/00_phenotypes_and_location_summary.tsv", 
 dt_loc <- fread("../phenotype_data/00_phenotypes_and_location_summary.tsv")
 dt_loc %>%
   kable("html", escape=FALSE, format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
-  row_spec(13, bold = T, color = "white", background = "#f65200") %>%  
+  row_spec(nrow(dt_loc), bold = T, color = "white", background = "#f65200") %>%  
   kable_styling('hover')
 
 ```
@@ -69,7 +69,31 @@ dt_loc$Total = rowSums(dt_loc[,2:ncol(dt_loc)])
 
 dt_loc %>%
   kable("html", escape=FALSE, format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
-  row_spec(13, bold = T, color = "white", background = "#f65200") %>%  
+  row_spec(nrow(dt_loc), bold = T, color = "white", background = "#f65200") %>%  
+  kable_styling('hover')
+
+```
+
+Finally, the split by PI was as follows:
+
+```{r sample_compositio_PI, echo=FALSE}
+dt_pheno <- fread("../phenotype_data/BIP_phenotype_information_cleaned_new_subtype_information_added.tsv")
+
+dt_loc <- dt_pheno %>% group_by(PI) %>% 
+    summarize(Controls = sum(PHENOTYPE_FINE_NEW=="Control"),
+                       "Bipolar Disorder 1" = sum(PHENOTYPE_FINE_NEW=="Bipolar Disorder 1"),
+                       "Bipolar Disorder 2" = sum(PHENOTYPE_FINE_NEW=="Bipolar Disorder 2"),
+                       "Bipolar Disorder" = sum(PHENOTYPE_FINE_NEW=="Bipolar Disorder"),
+                        Schizoaffective = sum(PHENOTYPE_FINE_NEW=="Schizoaffective"),
+                        Schizophrenia = sum(PHENOTYPE_FINE_NEW=="Schizophrenia"),
+                        Other = sum(PHENOTYPE_FINE_NEW=="Other"),
+                        Unknown = sum(PHENOTYPE_FINE_NEW=="Unknown"))
+dt_loc <- rbind(dt_loc, c("Total", colSums(dt_loc[,2:ncol(dt_loc)])))
+fwrite(dt_loc, file="../phenotype_data/00_phenotypes_and_PI_summary.tsv", row.names=FALSE, sep='\t')
+dt_loc <- fread("../phenotype_data/00_phenotypes_and_PI_summary.tsv")
+dt_loc %>%
+  kable("html", escape=FALSE, format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
+  row_spec(nrow(dt_loc), bold = T, color = "white", background = "#f65200") %>%  
   kable_styling('hover')
 
 ```
@@ -122,7 +146,7 @@ dt[6,1] <- "Variants after initial filter"
 dt[,"%"] <- round(100 * dt$Variants/dt$Variants[1], 1)
 dt %>% mutate("%" = color_bar("lightgreen")(unlist(dt[,'%']))) %>% 
   kable("html", escape=FALSE, align=c('l', 'r', 'r'), format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
-  row_spec(6, bold = T, color = "white", background = "#f65200") %>% 
+  row_spec(nrow(dt), bold = T, color = "white", background = "#f65200") %>% 
   kable_styling('hover')
 
 ```
@@ -136,7 +160,7 @@ names(dt) <- c("Filter", "Samples")
 dt[,"%"] <- round(100 * dt$Samples/dt$Samples[1], 1)
 dt %>% mutate("%" = color_bar("lightgreen")(unlist(dt[,'%']))) %>% 
   kable("html", escape=FALSE, align=c('l', 'r', 'r'), format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
-  row_spec(4, bold = T, color = "white", background = "#f65200") %>% 
+  row_spec(nrow(dt), bold = T, color = "white", background = "#f65200") %>% 
   kable_styling('hover')
 
 ```
@@ -166,7 +190,7 @@ names(dt) <- c("Filter", "Samples")
 dt[,"%"] <- round(100 * dt$Samples/dt$Samples[1], 1)
 dt %>% mutate("%" = color_bar("lightgreen")(unlist(dt[,'%']))) %>% 
   kable("html", escape=FALSE, align=c('l', 'r', 'r'), format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
-  row_spec(7, bold = T, color = "white", background = "#f65200") %>% 
+  row_spec(nrow(dt), bold = T, color = "white", background = "#f65200") %>% 
   kable_styling('hover')
 
 ```
@@ -205,7 +229,7 @@ fwrite(dt_sex_removal, file="../samples_Dalio/05_sexcheck_sample_count.tsv", row
 dt_sex_removal <- fread("../samples_Dalio/05_sexcheck_sample_count.tsv")
 dt_sex_removal %>% mutate("%" = color_bar("lightgreen")(unlist(dt_sex_removal[,'%']))) %>% 
   kable("html", escape=FALSE, align=c('l', 'r', 'r'), format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
-  row_spec(3, bold = T, color = "white", background = "#f65200") %>% 
+  row_spec(nrow(dt_sex_removal), bold = T, color = "white", background = "#f65200") %>% 
   kable_styling('hover')
 
 ```
@@ -238,7 +262,7 @@ fwrite(dt_ibd_removal, file="../samples_Dalio/06_ibd_sample_count.tsv", row.name
 dt_ibd_removal <- fread("../samples_Dalio/06_ibd_sample_count.tsv")
 dt_ibd_removal %>% mutate("%" = color_bar("lightgreen")(unlist(dt_ibd_removal[,'%']))) %>% 
   kable("html", escape=FALSE, align=c('l', 'r', 'r'), format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
-  row_spec(3, bold = T, color = "white", background = "#f65200") %>% 
+  row_spec(nrow(dt_ibd_removal), bold = T, color = "white", background = "#f65200") %>% 
   kable_styling('hover')
 
 ```
@@ -289,7 +313,7 @@ dt[,"%"] <- round(100 * dt$Samples/dt$Samples[1], 1)
 
 dt %>% mutate("%" = color_bar("lightgreen")(unlist(dt[,'%']))) %>% 
   kable("html", escape=FALSE, align=c('l', 'r', 'r'), format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
-  row_spec(4, bold = T, color = "white", background = "#f65200") %>% 
+  row_spec(nrow(dt), bold = T, color = "white", background = "#f65200") %>% 
   kable_styling('hover')
 
 ```
@@ -322,7 +346,7 @@ dt[,"%"] <- round(100 * dt$Samples/dt$Samples[1], 1)
 
 dt %>% mutate("%" = color_bar("lightgreen")(unlist(dt[,'%']))) %>% 
   kable("html", escape=FALSE, align=c('l', 'r', 'r'), format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
-  row_spec(4, bold = T, color = "white", background = "#f65200") %>% 
+  row_spec(nrow(dt), bold = T, color = "white", background = "#f65200") %>% 
   kable_styling('hover')
 
 ```
@@ -357,7 +381,7 @@ dt[,"%"] <- round(100 * dt$Variants/dt$Variants[1], 1)
 
 dt %>% mutate("%" = color_bar("lightgreen")(unlist(dt[,'%']))) %>% 
   kable("html", escape=FALSE, align=c('l', 'r', 'r'), format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
-  row_spec(8, bold = T, color = "white", background = "#f65200") %>% 
+  row_spec(nrow(dt), bold = T, color = "white", background = "#f65200") %>% 
   kable_styling('hover')
 
 ```
@@ -390,7 +414,7 @@ dt[,"%"] <- round(100 * dt$Samples/dt$Samples[1], 1)
 
 dt %>% mutate("%" = color_bar("lightgreen")(unlist(dt[,'%']))) %>% 
   kable("html", escape=FALSE, align=c('l', 'r', 'r'), format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
-  row_spec(6, bold = T, color = "white", background = "#f65200") %>% 
+  row_spec(nrow(dt), bold = T, color = "white", background = "#f65200") %>% 
   kable_styling('hover')
 
 ```
@@ -426,7 +450,7 @@ fwrite(dt_loc, file="../phenotype_data/17_phenotypes_and_location_summary.tsv", 
 dt_loc <- fread("../phenotype_data/17_phenotypes_and_location_summary.tsv")
 dt_loc %>%
   kable("html", escape=FALSE, format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
-  row_spec(13, bold = T, color = "white", background = "#f65200") %>%  
+  row_spec(nrow(dt_loc), bold = T, color = "white", background = "#f65200") %>%  
   kable_styling('hover')
 
 ```
@@ -451,7 +475,7 @@ dt_loc$Total = rowSums(dt_loc[,2:ncol(dt_loc)])
 
 dt_loc %>%
   kable("html", escape=FALSE, format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
-  row_spec(13, bold = T, color = "white", background = "#f65200") %>%  
+  row_spec(nrow(dt_loc), bold = T, color = "white", background = "#f65200") %>%  
   kable_styling('hover')
 
 ```

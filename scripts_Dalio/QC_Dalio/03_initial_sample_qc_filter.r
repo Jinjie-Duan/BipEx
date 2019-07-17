@@ -1,4 +1,5 @@
 library(dplyr)
+library(data.table)
 source("r_functions_and_parameters/r_options_Dalio.r")
 
 # Run the plotting again to ensure that the thresholds are as in the plots.
@@ -57,6 +58,20 @@ df_summary_count <- data.table(
 				nrow(filter(df, PCT_CHIMERAS >= T_pct_chimeras)),
 				nrow(filter(df, dp_stats.mean <= T_dpMean)),
 				nrow(filter(df, gq_stats.mean <= T_gqMean)),
-				nrow(df_out)))
+				nrow(df_out)),
+	"Bipolar Cases" = c(nrow(df %>% filter(PHENOTYPE_COARSE == "Bipolar Disorder")),
+			    nrow(filter(df, call_rate <= T_sample_callRate) %>% filter(PHENOTYPE_COARSE == "Bipolar Disorder")),
+				nrow(filter(df, PCT_CONTAMINATION >= T_pct_contamination) %>% filter(PHENOTYPE_COARSE == "Bipolar Disorder")),
+				nrow(filter(df, PCT_CHIMERAS >= T_pct_chimeras) %>% filter(PHENOTYPE_COARSE == "Bipolar Disorder")),
+				nrow(filter(df, dp_stats.mean <= T_dpMean) %>% filter(PHENOTYPE_COARSE == "Bipolar Disorder")),
+				nrow(filter(df, gq_stats.mean <= T_gqMean) %>% filter(PHENOTYPE_COARSE == "Bipolar Disorder")),
+				nrow(df_out %>% filter(PHENOTYPE_COARSE == "Bipolar Disorder"))),
+	Controls = c(nrow(df %>% filter(PHENOTYPE_COARSE == "Bipolar Disorder")),
+			    nrow(filter(df, call_rate <= T_sample_callRate) %>% filter(PHENOTYPE_COARSE == "Control")),
+				nrow(filter(df, PCT_CONTAMINATION >= T_pct_contamination) %>% filter(PHENOTYPE_COARSE == "Control")),
+				nrow(filter(df, PCT_CHIMERAS >= T_pct_chimeras) %>% filter(PHENOTYPE_COARSE == "Control")),
+				nrow(filter(df, dp_stats.mean <= T_dpMean) %>% filter(PHENOTYPE_COARSE == "Control")),
+				nrow(filter(df, gq_stats.mean <= T_gqMean) %>% filter(PHENOTYPE_COARSE == "Control")),
+				nrow(df_out %>% filter(PHENOTYPE_COARSE == "Control"))))
 
 fwrite(df_summary_count, file='../../samples_Dalio/03_sample_count.tsv', quote=FALSE, row.names=FALSE, col.names=FALSE, sep='\t')
