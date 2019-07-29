@@ -17,8 +17,7 @@ n_SDs <- 3
 df_keep_ti_tv <- group_by(df_after, phenotype.PROJECT_OR_COHORT) %>%
   summarise(mean=mean(sample_qc.r_ti_tv), sd=sd(sample_qc.r_ti_tv)) %>%
   inner_join(df_after, by='phenotype.PROJECT_OR_COHORT') %>%
-  filter((sample_qc.r_ti_tv >= mean - n_SDs*sd & sample_qc.r_ti_tv <= mean + n_SDs*sd) | is.na(sd)) %>%
-  select(s)
+  filter((sample_qc.r_ti_tv >= mean - n_SDs*sd & sample_qc.r_ti_tv <= mean + n_SDs*sd) | is.na(sd))
 
 df_keep <- df_keep_ti_tv %>% inner_join(df_keep, by='s')
 print(paste0("Remove Ti/Tv outliers: ", nrow(df_keep), " samples remain"))
@@ -27,8 +26,7 @@ print(paste0("Remove Ti/Tv outliers: ", nrow(df_keep), " samples remain"))
 df_keep_het_hom_var <- group_by(df_after, phenotype.PROJECT_OR_COHORT) %>%
   summarise(mean=mean(sample_qc.r_het_hom_var), sd=sd(sample_qc.r_het_hom_var)) %>%
   inner_join(df_after, by='phenotype.PROJECT_OR_COHORT') %>%
-  filter((sample_qc.r_het_hom_var >= mean - n_SDs*sd & sample_qc.r_het_hom_var <= mean + n_SDs*sd) | is.na(sd)) %>%
-  select(s)
+  filter((sample_qc.r_het_hom_var >= mean - n_SDs*sd & sample_qc.r_het_hom_var <= mean + n_SDs*sd) | is.na(sd))
 
 df_keep <- df_keep_het_hom_var %>% inner_join(df_keep, by='s')
 print(paste0("Remove Het/HomVar outliers: ", nrow(df_keep), " samples remain"))
@@ -37,8 +35,7 @@ print(paste0("Remove Het/HomVar outliers: ", nrow(df_keep), " samples remain"))
 df_keep_insertion_deletion <- group_by(df_after, phenotype.PROJECT_OR_COHORT) %>%
   summarise(mean=mean(sample_qc.r_insertion_deletion), sd=sd(sample_qc.r_insertion_deletion)) %>%
   inner_join(df_after, by='phenotype.PROJECT_OR_COHORT') %>%
-  filter((sample_qc.r_insertion_deletion >= mean - n_SDs*sd & sample_qc.r_insertion_deletion <= mean + n_SDs*sd) | is.na(sd)) %>%
-  select(s)
+  filter((sample_qc.r_insertion_deletion >= mean - n_SDs*sd & sample_qc.r_insertion_deletion <= mean + n_SDs*sd) | is.na(sd))
 
 df_keep <- df_keep_insertion_deletion %>% inner_join(df_keep, by='s')
 print(paste0("Remove Ins/Del outliers: ", nrow(df_keep), " samples remain"))
@@ -47,8 +44,7 @@ print(paste0("Remove Ins/Del outliers: ", nrow(df_keep), " samples remain"))
 df_keep_n_singletons <- group_by(df_after, phenotype.LOCATION) %>%
   summarise(mean=mean(sample_qc.n_singleton), sd=sd(sample_qc.n_singleton)) %>%
   inner_join(df_after, by='phenotype.LOCATION') %>%
-  filter((sample_qc.n_singleton >= mean - n_SDs*sd & sample_qc.n_singleton <= mean + n_SDs*sd) | is.na(sd)) %>%
-  select(s)
+  filter((sample_qc.n_singleton >= mean - n_SDs*sd & sample_qc.n_singleton <= mean + n_SDs*sd) | is.na(sd))
 
 df_keep <- df_keep_n_singletons %>% inner_join(df_keep, by='s')
 
@@ -65,7 +61,19 @@ df_final_sample_summary <- data.table(Filter = c("Samples after population filte
                                 nrow(df_after) - nrow(df_keep_het_hom_var),
                                 nrow(df_after) - nrow(df_keep_insertion_deletion),
                                 nrow(df_after) - nrow(df_keep_n_singletons),
-                                nrow(df_keep)))
+                                nrow(df_keep)),
+                     'Bipolar Cases' = c(nrow(df_after %>% filter(phenotype.PHENOTYPE_COARSE=="Bipolar Disorder")),
+                      nrow(df_after %>% filter(phenotype.PHENOTYPE_COARSE=="Bipolar Disorder")) - nrow(df_keep_ti_tv %>% filter(phenotype.PHENOTYPE_COARSE == "Bipolar Disorder")),
+                      nrow(df_after %>% filter(phenotype.PHENOTYPE_COARSE=="Bipolar Disorder")) - nrow(df_keep_het_hom_var %>% filter(phenotype.PHENOTYPE_COARSE == "Bipolar Disorder")),
+                      nrow(df_after %>% filter(phenotype.PHENOTYPE_COARSE=="Bipolar Disorder")) - nrow(df_keep_insertion_deletion %>% filter(phenotype.PHENOTYPE_COARSE == "Bipolar Disorder")),
+                      nrow(df_after %>% filter(phenotype.PHENOTYPE_COARSE=="Bipolar Disorder")) - nrow(df_keep_n_singletons %>% filter(phenotype.PHENOTYPE_COARSE == "Bipolar Disorder")),
+                      nrow(df_keep %>% filter(phenotype.PHENOTYPE_COARSE.x=="Bipolar Disorder"))),
+                     Controls = c(nrow(df_after %>% filter(phenotype.PHENOTYPE_COARSE=="Control")),
+                      nrow(df_after %>% filter(phenotype.PHENOTYPE_COARSE=="Control")) - nrow(df_keep_ti_tv %>% filter(phenotype.PHENOTYPE_COARSE == "Control")),
+                      nrow(df_after %>% filter(phenotype.PHENOTYPE_COARSE=="Control")) - nrow(df_keep_het_hom_var %>% filter(phenotype.PHENOTYPE_COARSE == "Control")),
+                      nrow(df_after %>% filter(phenotype.PHENOTYPE_COARSE=="Control")) - nrow(df_keep_insertion_deletion %>% filter(phenotype.PHENOTYPE_COARSE == "Control")),
+                      nrow(df_after %>% filter(phenotype.PHENOTYPE_COARSE=="Control")) - nrow(df_keep_n_singletons %>% filter(phenotype.PHENOTYPE_COARSE == "Control")),
+                      nrow(df_keep %>% filter(phenotype.PHENOTYPE_COARSE.x=="Control"))))
 
 fwrite(df_final_sample_summary, file='../../samples_Dalio/15_sample_count.tsv', quote=FALSE, row.names=FALSE, col.names=FALSE, sep='\t')
 

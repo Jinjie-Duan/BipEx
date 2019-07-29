@@ -127,7 +127,6 @@ if (perform_plotting) {
         p <- create_pretty_scatter(df_classify, aes,
           save_figure=save_figures, file=paste0(PLOTS,'10_PC',i,'_PC',i+1,'_classify_EUR_strict'), n_x_ticks=5,
           x_label=paste0('Principal Component ',i), y_label=paste0('Principal Component ', i+1))
-
     }
 }
 

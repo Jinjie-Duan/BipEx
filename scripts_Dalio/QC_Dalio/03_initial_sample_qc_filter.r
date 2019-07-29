@@ -5,6 +5,9 @@ source("r_functions_and_parameters/r_options_Dalio.r")
 # Run the plotting again to ensure that the thresholds are as in the plots.
 source("03_initial_sample_qc_plot.r")
 
+# Remove the low coverage samples as defined by Excel spreadsheet e-mailed from Laura Gauthier
+low_coverage <- fread("Dalio_Low_Coverage_Samples.txt")$SAMPLE
+
 QC_FILE <- "gsutil cat gs://dalio_bipolar_w1_w2_hail_02/data/samples/03_initial_sample_qc.tsv"
 df <- fread(QC_FILE, sep='\t', header=TRUE, data.table=FALSE)
 names(df) <- gsub("phenotype\\.", "", names(df))
@@ -22,12 +25,18 @@ df_initial_summary_count <- data.table(
 	Filter = c("Initial samples", "Unknown phenotype", "Low coverage or high contamination"),
 	Samples = c(nrow(df),
 				nrow(filter(df, PHENOTYPE_COARSE=='Unknown')),
-				nrow(df[which(df$s %in% low_coverage),])))
+				nrow(df[which(df$s %in% low_coverage),])),
+	"Bipolar cases" = c(nrow(df %>% filter(PHENOTYPE_COARSE == "Bipolar Disorder")),
+				nrow(filter(df, PHENOTYPE_COARSE == "Bipolar Disorder") %>% filter(PHENOTYPE_COARSE == 'Unknown')),
+				nrow(df[which((df$s %in% low_coverage) & df$PHENOTYPE_COARSE == "Bipolar Disorder"),])),
+	"Controls" = c(nrow(df %>% filter(PHENOTYPE_COARSE == "Control")),
+				nrow(filter(df, PHENOTYPE_COARSE == "Control") %>% filter(PHENOTYPE_COARSE == 'Unknown')),
+				nrow(df[which((df$s %in% low_coverage) & df$PHENOTYPE_COARSE == "Control"),])))
 
-df <- filter(df, PHENOTYPE_COARSE!='Unknown')
-df <- df[-which(df$s %in% low_coverage),]
-
-df_initial_summary_count <- rbindlist(list(df_initial_summary_count, list("Samples after initial filter", nrow(df))), use.names=FALSE)
+df <- df[-which(df$s %in% low_coverage),] %>% filter(PHENOTYPE_COARSE != 'Unknown')
+df_initial_summary_count <- rbindlist(list(df_initial_summary_count, list("Samples after initial filter", nrow(df),
+	nrow(df %>% filter(PHENOTYPE_COARSE == "Bipolar Disorder")),
+	nrow(df %>% filter(PHENOTYPE_COARSE == "Control")))), use.names=FALSE)
 fwrite(df_initial_summary_count, file='../../samples_Dalio/03_initial_sample_count.tsv', quote=FALSE, row.names=FALSE, col.names=FALSE, sep='\t')
 
 names(df) <- gsub("qc_padded_ice\\.", "", names(df))
@@ -65,13 +74,13 @@ df_summary_count <- data.table(
 				nrow(filter(df, PCT_CHIMERAS >= T_pct_chimeras) %>% filter(PHENOTYPE_COARSE == "Bipolar Disorder")),
 				nrow(filter(df, dp_stats.mean <= T_dpMean) %>% filter(PHENOTYPE_COARSE == "Bipolar Disorder")),
 				nrow(filter(df, gq_stats.mean <= T_gqMean) %>% filter(PHENOTYPE_COARSE == "Bipolar Disorder")),
-				nrow(df_out %>% filter(PHENOTYPE_COARSE == "Bipolar Disorder"))),
+				length(which(df_out$s %in% (df %>% filter(PHENOTYPE_COARSE == "Bipolar Disorder"))$s))),
 	Controls = c(nrow(df %>% filter(PHENOTYPE_COARSE == "Bipolar Disorder")),
 			    nrow(filter(df, call_rate <= T_sample_callRate) %>% filter(PHENOTYPE_COARSE == "Control")),
 				nrow(filter(df, PCT_CONTAMINATION >= T_pct_contamination) %>% filter(PHENOTYPE_COARSE == "Control")),
 				nrow(filter(df, PCT_CHIMERAS >= T_pct_chimeras) %>% filter(PHENOTYPE_COARSE == "Control")),
 				nrow(filter(df, dp_stats.mean <= T_dpMean) %>% filter(PHENOTYPE_COARSE == "Control")),
 				nrow(filter(df, gq_stats.mean <= T_gqMean) %>% filter(PHENOTYPE_COARSE == "Control")),
-				nrow(df_out %>% filter(PHENOTYPE_COARSE == "Control"))))
+				length(which(df_out$s %in% (df %>% filter(PHENOTYPE_COARSE == "Control"))$s))))
 
 fwrite(df_summary_count, file='../../samples_Dalio/03_sample_count.tsv', quote=FALSE, row.names=FALSE, col.names=FALSE, sep='\t')
