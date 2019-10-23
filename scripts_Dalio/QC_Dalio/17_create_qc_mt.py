@@ -109,6 +109,8 @@ mt_cols.select(
 	PCA = mt_cols.pca).flatten().export(FINAL_SAMPLE_QC_FILE)
 
 mt_rows = mt.rows()
+
+# Want to write out the alternative allele count!
 mt_rows.select(
 	rsid = mt_rows.annotation.rsid,
 	was_split = mt_rows.annotation.was_split,
@@ -116,20 +118,21 @@ mt_rows.select(
 	gene_id = mt_rows.annotation.vep.worst_csq_for_variant_canonical.gene_id,
 
 	# Still need to add these annotations...latest hg38 for GnomAD is available, can use that I think.
-	pli_nopsych = mt_rows.annotation.gene_constraint.pli_nopsych,
-	lof_z_nopsych = mt_rows.annotation.gene_constraint.lof_z_nopsych,
-	mis_z_nopsych = mt_rows.annotation.gene_constraint.mis_z_nopsych,
-	syn_z_nopsych = mt_rows.annotation.gene_constraint.syn_z_nopsych,
+	# I currently just annotate this after.
+	# pli_nopsych = mt_rows.annotation.gene_constraint.pli_nopsych,
+	# lof_z_nopsych = mt_rows.annotation.gene_constraint.lof_z_nopsych,
+	# mis_z_nopsych = mt_rows.annotation.gene_constraint.mis_z_nopsych,
+	# syn_z_nopsych = mt_rows.annotation.gene_constraint.syn_z_nopsych,
 
-	most_severe_consequence = mt_rows.annotation.vep..worst_csq_for_variant_canonical.most_severe_consequence,
-	consequence_category = mt_rows.annotation.vep.consequence_category,
+	most_severe_consequence = mt_rows.annotation.vep.worst_csq_for_variant_canonical.most_severe_consequence,
+	consequence_category = mt_rows.annotation.consequence_category,
 
 	polyphen_prediction = mt_rows.annotation.vep.worst_csq_for_variant_canonical.polyphen_prediction,
 	sift_prediction = mt_rows.annotation.vep.worst_csq_for_variant_canonical.sift_prediction,
 
-	inGnomAD_nonpsych = mt_rows.annotation.vep.inGnomAD_nonpsych,
-	cadd_phred_score = mt_rows.annotation.vep.cadd.PHRED_score,
-	mpc_score = mt_rows.annotation.vep.mpc.MPC,
+	inGnomAD_nonpsych = mt_rows.annotation.inGnomAD_nonpsych,
+	cadd_phred_score = mt_rows.annotation.cadd.PHRED_score,
+	mpc_score = mt_rows.annotation.mpc.MPC,
 
 	qc = mt_rows.qc).flatten().export(FINAL_VARIANT_QC_FILE)
  

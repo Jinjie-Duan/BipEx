@@ -195,7 +195,7 @@ create_pretty_scatter <- function(df, aes, file='file_out', save_figure=FALSE,
 }
 
 create_pretty_qq_plot <- function(df, aes, file='file_out', save_figure=FALSE,
-    title='', limits=NULL, width=90, height=90, n_x_ticks=10, n_y_ticks=10,
+    title='', limits=NULL, width=110, height=110, n_x_ticks=10, n_y_ticks=10,
     x_label=TeX("$-\\log(p_{permutation})$"), 
     y_label=TeX("$-\\log(p_{observed})$"),
     threshold_for_labels=NULL, cex_labels=1)
@@ -208,8 +208,7 @@ create_pretty_qq_plot <- function(df, aes, file='file_out', save_figure=FALSE,
     p <- p + geom_abline(intercept=0, slope=1, color='indianred3')
 
     if(!is.null(threshold_for_labels)) {
-        print(which(df$pval > threshold))
-        p <- p + geom_label_repel(data=subset(df, df$pval > threshold_for_labels),
+        p <- p + geom_label_repel(data=subset(df, df$pval >= threshold_for_labels),
             aes(label=labels), box.padding = 0.5, label.padding=0.1, point.padding = 0.1,
             segment.color = 'grey50', size=cex_labels, segment.size=0.1)
     }
