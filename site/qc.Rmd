@@ -24,7 +24,7 @@ require(formattable)
 require(htmltools)
 source("../scripts_Dalio/QC_Dalio/r_functions_and_parameters/r_options_Dalio.r")
 ```
-
+ <br> 
 On this page we detail the quality control (QC) pipeline for for the BipEx dataset. Further plots, the underlying [code](https://github.com/astheeggeggs/BipEx/tree/master/scripts_Dalio/QC_Dalio) and a [document](https://github.com/astheeggeggs/BipEx/blob/master/scripts_Dalio/QC_Dalio/QC_pipeline_writeup/pipeline_writeup.tex) summarising the pipeline can be found on the BipEx github [repository](https://github.com/astheeggeggs/BipEx).
 
 We first summarise the collection of samples, splitting across cohorts and subtypes. In addtition to Bipolar cases, we also a collection of Schizophrenia cases that will serve as positive controls for our PTV burden analyses.
@@ -33,56 +33,72 @@ We first summarise the collection of samples, splitting across cohorts and subty
 dt_pheno <- fread("../phenotype_data/BIP_phenotype_information_cleaned_new_subtype_information_added.tsv")
 
 dt_loc <- dt_pheno %>% group_by(LOCATION) %>% 
-    summarize(Controls = sum(PHENOTYPE_COARSE_NEW=="Control"),
-                       "Bipolar Disorder" = sum(PHENOTYPE_COARSE_NEW=="Bipolar Disorder"),
-                        Schizoaffective = sum(PHENOTYPE_COARSE_NEW=="Schizoaffective"),
-                        Schizophrenia = sum(PHENOTYPE_COARSE_NEW=="Schizophrenia"),
-                        Other=sum(PHENOTYPE_COARSE_NEW=="Other"),
-                        Unknown=sum(PHENOTYPE_COARSE_NEW=="Unknown"),
-                        Total=n())
+  summarize("Bipolar Disorder" = sum(PHENOTYPE_COARSE_NEW=="Bipolar Disorder"),
+            "Schizoaffective" = sum(PHENOTYPE_COARSE_NEW=="Schizoaffective"),
+            "Schizophrenia" = sum(PHENOTYPE_COARSE_NEW=="Schizophrenia"),
+            "Other"=sum(PHENOTYPE_COARSE_NEW=="Other"),
+            "Unknown"=sum(PHENOTYPE_COARSE_NEW=="Unknown"),
+            "Controls" = sum(PHENOTYPE_COARSE_NEW=="Control"),
+            "Total"=n())
 dt_loc <- rbind(dt_loc, c("Total", colSums(dt_loc[,2:ncol(dt_loc)])))
 
 fwrite(dt_loc, file="../phenotype_data/00_phenotypes_and_location_summary.tsv", row.names=FALSE, sep='\t')
-dt_loc <- fread("../phenotype_data/00_phenotypes_and_location_summary.tsv")
+dt_loc <- fread("../phenotype_data/00_phenotypes_and_location_summary.tsv") %>% rename(Location=LOCATION)
 dt_loc %>%
   kable("html", escape=FALSE, format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
-  row_spec(nrow(dt_loc), bold = T, color = "white", background = "#f65200") %>%  
-  kable_styling('hover')
+  row_spec(nrow(dt_loc), bold = T, color = "white", background = "#f65200") %>% 
+  kable_styling('hover', font_size=12)
 
 ```
+<br>
 
 Within the collection of Bipolar cases, we have subtype information: Bipolar 1, and Bipolar 2. Further splitting the cases and labelling Bipolar cases for whom we do not have subtype information available, we obtain the following numbers of samples in each subcategory:
 
 ```{r sample_subtype_composition, echo=FALSE, out.width = '100%', warning=FALSE}
+# Note that here we are shuffling over unknown phenotypes in the fine definition to ensure that the coarse and fine definitions match.
+# We also shift some fine phenotypes to Bipolar Disorder based on their definition in the 'phenotype coarse new'.
+
+dt_pheno$PHENOTYPE_FINE_NEW_CHECK <- dt_pheno$PHENOTYPE_FINE_NEW
+dt_pheno$PHENOTYPE_FINE_NEW_CHECK[grep("Bipolar Disorder", dt_pheno$PHENOTYPE_FINE_NEW_CHECK)] <- "Bipolar Disorder"
+# These are the mismatches:
+# dt_pheno[which(dt_pheno$PHENOTYPE_FINE_NEW_CHECK != dt_pheno$PHENOTYPE_COARSE_NEW),]
+
+dt_pheno$PHENOTYPE_FINE_NEW[(dt_pheno$PHENOTYPE_FINE_NEW_CHECK == "Unknown") & (dt_pheno$PHENOTYPE_COARSE_NEW == "Other")] <- "Other"
+dt_pheno$PHENOTYPE_FINE_NEW_CHECK[(dt_pheno$PHENOTYPE_FINE_NEW_CHECK == "Unknown") & (dt_pheno$PHENOTYPE_COARSE_NEW == "Other")] <- "Other"
+
+dt_pheno$PHENOTYPE_FINE_NEW[which(dt_pheno$PHENOTYPE_FINE_NEW_CHECK != dt_pheno$PHENOTYPE_COARSE_NEW)] <- "Bipolar Disorder"
+
+fwrite(dt_pheno, file="../phenotype_data/BIP_phenotype_information_cleaned_new_subtype_information_added_and_harmonised.tsv")
 
 dt_loc <- dt_pheno %>% group_by(LOCATION) %>% 
     summarize("Bipolar Disorder 1" = sum(PHENOTYPE_FINE_NEW=="Bipolar Disorder 1"),
               "Bipolar Disorder 2" = sum(PHENOTYPE_FINE_NEW=="Bipolar Disorder 2"),
               "Bipolar Disorder NOS" = sum(PHENOTYPE_FINE_NEW=="Bipolar Disorder"),
-              Schizoaffective = sum(PHENOTYPE_FINE_NEW=="Schizoaffective"),
-              "Bipolar Total" = sum(PHENOTYPE_FINE_NEW=="Bipolar Disorder" |
+              "Schizoaffective" = sum(PHENOTYPE_FINE_NEW=="Schizoaffective"),
+              "Bipolar Total (including schizoaffective)" = sum(PHENOTYPE_FINE_NEW=="Bipolar Disorder" |
                                 PHENOTYPE_FINE_NEW=="Bipolar Disorder 1" | 
                                 PHENOTYPE_FINE_NEW=="Bipolar Disorder 2" |
                                 PHENOTYPE_FINE_NEW=="Schizoaffective"),
-              Controls = sum(PHENOTYPE_FINE_NEW=="Control"))
+              "Controls" = sum(PHENOTYPE_FINE_NEW=="Control"))
 dt_loc <- rbind(dt_loc, c("Total", colSums(dt_loc[,2:ncol(dt_loc)])))
 fwrite(dt_loc, file="../phenotype_data/00_subphenotypes_and_location_summary.tsv", row.names=FALSE, sep='\t')
-dt_loc <- fread("../phenotype_data/00_subphenotypes_and_location_summary.tsv")
-dt_loc$Total = rowSums(dt_loc[,c("Controls", "Bipolar Total")])
+dt_loc <- fread("../phenotype_data/00_subphenotypes_and_location_summary.tsv") %>% rename(Location=LOCATION)
+dt_loc$Total = rowSums(dt_loc[,c("Controls", "Bipolar Total (including schizoaffective)")])
 
 dt_loc %>%
   kable("html", escape=FALSE, format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
   row_spec(nrow(dt_loc), bold = T, color = "white", background = "#f65200") %>%  
-  kable_styling('hover')
+  kable_styling('hover', font_size=12)
 
 ```
+<br>
 
 Finally, the split by PI was as follows:
 
 ```{r sample_composition_PI, echo=FALSE, out.width = '100%', warning=FALSE}
 
 dt_loc <- dt_pheno %>% group_by(PI) %>% 
-    summarize(Controls = sum(PHENOTYPE_FINE_NEW=="Control"),
+    summarize(
                        "Bipolar Disorder 1" = sum(PHENOTYPE_FINE_NEW=="Bipolar Disorder 1"),
                        "Bipolar Disorder 2" = sum(PHENOTYPE_FINE_NEW=="Bipolar Disorder 2"),
                        "Bipolar Disorder NOS" = sum(PHENOTYPE_FINE_NEW=="Bipolar Disorder"),
@@ -93,15 +109,20 @@ dt_loc <- dt_pheno %>% group_by(PI) %>%
                                 PHENOTYPE_FINE_NEW=="Schizoaffective"),
                         Schizophrenia = sum(PHENOTYPE_FINE_NEW=="Schizophrenia"),
                         Other = sum(PHENOTYPE_FINE_NEW=="Other"),
-                        Unknown = sum(PHENOTYPE_FINE_NEW=="Unknown"))
+                        Unknown = sum(PHENOTYPE_FINE_NEW=="Unknown"), 
+                        Controls = sum(PHENOTYPE_FINE_NEW=="Control"))
+dt_loc <- rbind(dt_loc, c("Total", colSums(dt_loc[,2:ncol(dt_loc)])))
 fwrite(dt_loc, file="../phenotype_data/00_phenotypes_and_PI_summary.tsv", row.names=FALSE, sep='\t')
 dt_loc <- fread("../phenotype_data/00_phenotypes_and_PI_summary.tsv")
 dt_loc$Total <- rowSums(dt_loc[,c("Controls", "Bipolar Total", "Schizophrenia", "Other", "Unknown")])
 dt_loc %>%
-  kable("html", escape=FALSE, format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
-  kable_styling('hover')
+  kable("html", escape=FALSE, format.args = list(big.mark = ",")) %>% 
+  row_spec(nrow(dt_loc), bold = T, color = "white", background = "#f65200") %>% row_spec(0, bold=TRUE) %>%
+  kable_styling('hover', font_size=11)
 
 ```
+
+<br> 
 
 For our QC pipeline, we first read in the `.vcf` file, split multiallelics, and remove sites with more than 6 alleles. After splitting muliallelics in the `.vcf` file containing 29,911,479 variants and restricting to these sites, we have 37,344,246 variants.
 
@@ -141,20 +162,25 @@ Remove variants that either:
 
 ```{r variant_table, echo=FALSE, out.width = '100%', warning=FALSE}
 
-dt <- fread('gsutil cat gs://dalio_bipolar_w1_w2_hail_02/data/summary_variant_table.tsv', header=FALSE)
-names(dt) <- c("Filter", "Variants")
-dt <- dt[2:nrow(dt),]
-dt <- dt[-6,]
-dt[5,1] <- "Invariant sites after initial variant and genotype filters"
-dt[5,2] <- dt[5,2] - dt[6,2]
-dt[6,1] <- "Variants after initial filter"
+# dt <- fread('gsutil cat gs://dalio_bipolar_w1_w2_hail_02/data/summary_variant_table.tsv', header=FALSE)
+# names(dt) <- c("Filter", "Variants")
+# dt <- dt[2:nrow(dt),]
+# dt <- dt[-6,]
+# dt[5,1] <- "Invariant sites after initial variant and genotype filters"
+# dt[5,2] <- dt[5,2] - dt[6,2]
+# dt[6,1] <- "Variants after initial filter"
+# dt[,"%"] <- round(100 * dt$Variants/dt$Variants[1], 1)
+
+dt <- fread('../variants_Dalio/02_summary_variant_table.tsv')
 dt[,"%"] <- round(100 * dt$Variants/dt$Variants[1], 1)
+
 dt %>% mutate("%" = color_bar("lightgreen")(unlist(dt[,'%']))) %>% 
   kable("html", escape=FALSE, align=c('l', 'r', 'r', 'r', 'r'), format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
   row_spec(nrow(dt), bold = T, color = "white", background = "#f65200") %>% 
   kable_styling('hover')
 
 ```
+<br>
 
 # Initial sample quality control
 
@@ -219,23 +245,30 @@ knitr::include_graphics("QC_plots/sample_plots/05_imputesex_histogram.jpg")
 ```
 
 ```{r sample_sex_removal_table, echo=FALSE, out.width = '100%', warning=FALSE}
+
+# Note that in these two tables, dt is the table that is displayed after the boxplots on webpage.
+
 sex_removed <- fread("../samples_Dalio/05_sexcheck.remove.sample_list", header=FALSE)
 dt_sex_removed <- dt_pheno[which(dt_pheno$SAMPLE_ALIAS %in% sex_removed$V1),]
 n_sex_removed <- c(nrow(dt_sex_removed),
                    nrow(dt_sex_removed %>% filter(PHENOTYPE_COARSE_NEW == "Bipolar Disorder")),
                    nrow(dt_sex_removed %>% filter(PHENOTYPE_COARSE_NEW == "Control")))
 
+# This is the number of samples after the initial round of sample QC filters (chimeric reads etc).
 n_before <- dt[nrow(dt),2:4]
+# This is the number after then removing the samples removed due to sex-swaps.
 n_after_sex_removed <- n_before - n_sex_removed
 
 dt_sex_removal <- rbindlist(
-    list(dt[1,],
+    list(dt[nrow(dt),],
         list(c("Samples with sex swap", "Samples after sex swap removal"),
              c(n_sex_removed[1], n_after_sex_removed$Samples),
              c(n_sex_removed[2], n_after_sex_removed$`Bipolar cases`),
              c(n_sex_removed[3], n_after_sex_removed$Controls),
-             c(round(n_sex_removed[1] / unlist(dt[1,2]) * 100,1),
-               round(n_after_sex_removed$Samples / unlist(dt[1,2]) * 100,1)))), use.names=FALSE)
+             c(round(n_sex_removed[1] / unlist(dt[nrow(dt),2]) * 100,1),
+               round(n_after_sex_removed$Samples / unlist(dt[nrow(dt),2]) * 100,1)))), use.names=FALSE)
+
+dt_sex_removal[1,5] <- 100
 
 fwrite(dt_sex_removal, file="../samples_Dalio/05_sexcheck_sample_count.tsv", row.names=FALSE, sep='\t')
 dt_sex_removal <- fread("../samples_Dalio/05_sexcheck_sample_count.tsv")
@@ -259,6 +292,9 @@ knitr::include_graphics("QC_plots/sample_plots/06_IBD_plot.jpg")
 We then create a sample list of patients such that no pair has $\hat{\pi} >$ `r IBD_THRESHOLD`.
 
 ```{r sample_ibd_table, echo=FALSE, out.width='100%', warning=FALSE}
+
+# Note that in these two tables, dt is the table that is displayed after the boxplots on webpage.
+
 ibd_removed <- fread("../samples_Dalio/06_ibd.remove.sample_list", header=FALSE)
 dt_ibd_removed <- dt_pheno[which(dt_pheno$SAMPLE_ALIAS %in% ibd_removed$V1),]
 
@@ -266,17 +302,21 @@ n_ibd_removed <- c(nrow(dt_ibd_removed),
                    nrow(dt_ibd_removed %>% filter(PHENOTYPE_COARSE_NEW == "Bipolar Disorder")),
                    nrow(dt_ibd_removed %>% filter(PHENOTYPE_COARSE_NEW == "Control")))
 
+# This is the number of samples after the initial round of sample QC filters (chimeric reads etc).
 n_before <- dt[nrow(dt),2:4]
+# This is the number after then removing related individuals - sex swaps an IBD are done concurrently.
 n_after_ibd_removed <- n_before - n_ibd_removed
 
 dt_ibd_removal <- rbindlist(
-    list(dt[1,],
+    list(dt[nrow(dt),],
         list(c("Related samples for removal", "Samples after IBD removal"),
              c(n_ibd_removed[1], n_after_ibd_removed$Samples),
              c(n_ibd_removed[2], n_after_ibd_removed$`Bipolar cases`),
              c(n_ibd_removed[3], n_after_ibd_removed$Controls),
-             c(round(n_ibd_removed[1] / unlist(dt[1,2]) * 100,1),
-               round(n_after_ibd_removed$Samples / unlist(dt[1,2]) * 100,1)))), use.names=FALSE)
+             c(round(n_ibd_removed[1] / unlist(dt[nrow(dt),2]) * 100,1),
+               round(n_after_ibd_removed$Samples / unlist(dt[nrow(dt),2]) * 100,1)))), use.names=FALSE)
+
+dt_ibd_removal[1,5] <- 100
 
 fwrite(dt_ibd_removal, file="../samples_Dalio/06_ibd_sample_count.tsv", row.names=FALSE, sep='\t')
 dt_ibd_removal <- fread("../samples_Dalio/06_ibd_sample_count.tsv")
@@ -326,39 +366,40 @@ knitr::include_graphics("QC_plots/sample_plots/10_PC5_PC6_classify_EUR_strict.jp
 
 ```{r sample_PC_table, echo=FALSE, warning=FALSE, message=FALSE, out.width = '100%'}
 
-PCA_SCORES <- 'gsutil cat gs://dalio_bipolar_w1_w2_hail_02/data/samples/09_pca_scores.tsv'
-EUROPEAN_SAMPLES_STRICT <- "../samples_Dalio/10_european.strict.sample_list"
-EUROPEAN_SAMPLES_LOOSE <- "../samples_Dalio/10_european.loose.sample_list"
+# PCA_SCORES <- 'gsutil cat gs://dalio_bipolar_w1_w2_hail_02/data/samples/09_pca_scores.tsv'
+# EUROPEAN_SAMPLES_STRICT <- "../samples_Dalio/10_european.strict.sample_list"
+# EUROPEAN_SAMPLES_LOOSE <- "../samples_Dalio/10_european.loose.sample_list"
 
-dt_pca <- fread(PCA_SCORES, sep='\t', stringsAsFactors=FALSE, header=TRUE, data.table=FALSE)
-eur_strict <- fread(EUROPEAN_SAMPLES_STRICT, stringsAsFactors=FALSE, header=FALSE, data.table=FALSE)
-eur_loose <- fread(EUROPEAN_SAMPLES_LOOSE, stringsAsFactors=FALSE, header=FALSE, data.table=FALSE)
+# dt_pca <- fread(PCA_SCORES, sep='\t', stringsAsFactors=FALSE, header=TRUE, data.table=FALSE)
+# eur_strict <- fread(EUROPEAN_SAMPLES_STRICT, stringsAsFactors=FALSE, header=FALSE, data.table=FALSE)
+# eur_loose <- fread(EUROPEAN_SAMPLES_LOOSE, stringsAsFactors=FALSE, header=FALSE, data.table=FALSE)
 
-names(dt_pca) <- gsub("phenotype.", "", names(dt_pca))
-dt_pca_case <- dt_pca %>% filter(PHENOTYPE_COARSE == "Bipolar Disorder")
-dt_pca_control <- dt_pca %>% filter(PHENOTYPE_COARSE == "Control")
+# dt_pca_merged <- merge(dt_pca, (dt_pheno %>% rename(s = SAMPLE_ALIAS)), by='s')
 
-dt <- data.table(Filter = c("Initial samples", "Non-European, strict filter",
-    "Non-European, loose filter", "Samples after strict European filter"),
-    Samples = c(nrow(dt_pca),
-        nrow(dt_pca[which(!(dt_pca$s %in% eur_strict$V1)),]),
-        nrow(dt_pca[which(!(dt_pca$s %in% eur_loose$V1)),]),
-        nrow(dt_pca[which(!(dt_pca$s %in% eur_strict$V1)),])),
-    'Bipolar cases' = c(nrow(dt_pca),
-        nrow(dt_pca_case[which(!(dt_pca_case$s %in% eur_strict$V1)),]),
-        nrow(dt_pca_case[which(!(dt_pca_case$s %in% eur_loose$V1)),]),
-        nrow(dt_pca_case[which(!(dt_pca_case$s %in% eur_strict$V1)),])),
-    Controls = c(nrow(dt_pca_control),
-        nrow(dt_pca_control[which(!(dt_pca_control$s %in% eur_strict$V1)),]),
-        nrow(dt_pca_control[which(!(dt_pca_control$s %in% eur_loose$V1)),]),
-        nrow(dt_pca_control[which(!(dt_pca_control$s %in% eur_strict$V1)),])))
+# dt_pca_case <- dt_pca_merged %>% filter(PHENOTYPE_COARSE_NEW == "Bipolar Disorder")
+# dt_pca_control <- dt_pca_merged %>% filter(PHENOTYPE_COARSE_NEW == "Control")
 
-dt[,"%"] <- round(100 * dt$Samples/dt$Samples[1], 1)
+# dt <- data.table(Filter = c("Initial samples", "Non-European, strict filter",
+#     "Non-European, loose filter", "Samples after strict European filter"),
+#     Samples = c(nrow(dt_pca),
+#         nrow(dt_pca[which(!(dt_pca$s %in% eur_strict$V1)),]),
+#         nrow(dt_pca[which(!(dt_pca$s %in% eur_loose$V1)),]),
+#         nrow(dt_pca[which((dt_pca$s %in% eur_strict$V1)),])),
+#     'Bipolar cases' = c(nrow(dt_pca_case),
+#         nrow(dt_pca_case[which(!(dt_pca_case$s %in% eur_strict$V1)),]),
+#         nrow(dt_pca_case[which(!(dt_pca_case$s %in% eur_loose$V1)),]),
+#         nrow(dt_pca_case[which((dt_pca_case$s %in% eur_strict$V1)),])),
+#     Controls = c(nrow(dt_pca_control),
+#         nrow(dt_pca_control[which(!(dt_pca_control$s %in% eur_strict$V1)),]),
+#         nrow(dt_pca_control[which(!(dt_pca_control$s %in% eur_loose$V1)),]),
+#         nrow(dt_pca_control[which((dt_pca_control$s %in% eur_strict$V1)),])))
 
-dt %>% mutate("%" = color_bar("lightgreen")(unlist(dt[,'%']))) %>% 
-  kable("html", escape=FALSE, align=c('l', 'r', 'r', 'r', 'r'), format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
-  row_spec(nrow(dt), bold = T, color = "white", background = "#f65200") %>% 
-  kable_styling('hover')
+# dt[,"%"] <- round(100 * dt$Samples/dt$Samples[1], 1)
+
+# dt %>% mutate("%" = color_bar("lightgreen")(unlist(dt[,'%']))) %>% 
+#   kable("html", escape=FALSE, align=c('l', 'r', 'r', 'r', 'r'), format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
+#   row_spec(nrow(dt), bold = T, color = "white", background = "#f65200") %>% 
+#   kable_styling('hover')
 
 ```
 
@@ -374,23 +415,38 @@ Run also ran a further collection of PCAs on:
 
 ```{r sample_PC_AJ_table, echo=FALSE, out.width = '100%', warning=FALSE}
 
-AJ <- fread('../samples_Dalio/12_aj.sample_list', header=FALSE)
-dt_AJ <- dt_pheno[which(dt_pheno$SAMPLE_ALIAS %in% AJ$V1),]
+# AJ <- fread('../samples_Dalio/12_aj.sample_list', header=FALSE)
+# dt_AJ <- dt_pheno[which(dt_pheno$SAMPLE_ALIAS %in% AJ$V1),]
 
-n_AJ <- c(nrow(dt_AJ),
-          nrow(dt_AJ %>% filter(PHENOTYPE_COARSE_NEW == "Bipolar Disorder")),
-          nrow(dt_AJ %>% filter(PHENOTYPE_COARSE_NEW == "Control")))
+# n_AJ <- c(nrow(dt_AJ),
+#           nrow(dt_AJ %>% filter(PHENOTYPE_COARSE_NEW == "Bipolar Disorder")),
+#           nrow(dt_AJ %>% filter(PHENOTYPE_COARSE_NEW == "Control")))
 
-dt_pca <- dt[-c(2,4),-c('%')]
-dt_pca <- rbindlist(list(dt_pca,
-    list(c("Ashkenazi Jewish samples", "Samples after loose European filter and AJs removed"),
-         c(n_AJ[1], dt[1,2] - dt[2,2] - n_AJ[1]),
-         c(n_AJ[2], dt[1,3] - dt[2,3] - n_AJ[2]),
-         c(n_AJ[3], dt[1,4] - dt[2,4] - n_AJ[3]))))
+# dt_pca <- dt[-c(2,4),-c('%')]
+# dt_pca <- rbindlist(list(dt_pca,
+#     list(c("Ashkenazi Jewish samples", "Samples after strict European filter and AJs removed"),
+#          c(n_AJ[1], dt[1,2] - dt[2,2] - length(setdiff(AJ$V1, eur_strict$V1))),
+#          c(n_AJ[2], dt[1,3] - dt[2,3] - n_AJ[2]),
+#          c(n_AJ[3], dt[1,4] - dt[2,4] - n_AJ[3]))))
 
-fwrite(dt, file="../samples_Dalio/12_aj_sample_count.tsv", row.names=FALSE, sep='\t')
-dt <- fread("../samples_Dalio/12_aj_sample_count.tsv")
+# fwrite(dt_pca, file="../samples_Dalio/12_aj_sample_count.tsv", row.names=FALSE, sep='\t')
+# dt_pca <- fread("../samples_Dalio/12_aj_sample_count.tsv")
 
+# dt_pca[,"%"] <- round(100 * dt_pca$Samples/dt_pca$Samples[1], 1)
+
+# dt_pca %>% mutate("%" = color_bar("lightgreen")(unlist(dt[,'%']))) %>% 
+#   kable("html", escape=FALSE, align=c('l', 'r', 'r', 'r', 'r'), format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
+#   row_spec(nrow(dt_pca), bold = T, color = "white", background = "#f65200") %>% 
+#   kable_styling('hover')
+
+```
+
+```{r pc_sample_table, echo=FALSE, out.width = '100%', warning=FALSE}
+
+dt <- fread('../samples_Dalio/15_sample_count.tsv', header=FALSE)
+names(dt) <- c("Filter", "Samples", "Bipolar cases", "Controls")
+dt <- rbind(dt_ibd_removal[nrow(dt_ibd_removal),1:4], dt)
+dt <- rbind(dt[1,], cbind(data.frame(Filter="PCA based filters"), dt[1,2:ncol(dt)] - dt[2,2:ncol(dt)]), dt[2,])
 dt[,"%"] <- round(100 * dt$Samples/dt$Samples[1], 1)
 
 dt %>% mutate("%" = color_bar("lightgreen")(unlist(dt[,'%']))) %>% 
@@ -484,22 +540,31 @@ The resultant composition of the samples was as follows:
 
 ```{r final_sample_composition, echo=FALSE, out.width = '100%', warning=FALSE}
 
-dt_loc <- dt_pheno %>% group_by(LOCATION) %>% 
-    summarize(Controls = sum(PHENOTYPE_COARSE=="Control"),
-                       "Bipolar Disorder" = sum(PHENOTYPE_COARSE=="Bipolar Disorder"),
-                        Schizoaffective = sum(PHENOTYPE_COARSE=="Schizoaffective"),
-                        Schizophrenia = sum(PHENOTYPE_COARSE=="Schizophrenia"),
-                        Other=sum(PHENOTYPE_COARSE=="Other"),
-                        Unknown=sum(PHENOTYPE_COARSE=="Unknown"),
+dt_final_samples <- fread("gsutil cat gs://dalio_bipolar_w1_w2_hail_02/data/samples/17_final_qc.samples.tsv.bgz | gzcat")
+
+if(any(duplicated(dt_pheno$SAMPLE_ALIAS))) {
+  dt_pheno <- dt_pheno[-duplicated(dt_pheno$SAMPLE_ALIAS),]
+}
+
+# Get rid of the single sample that has a duplicate SAMPLE_ALIAS - it is a control in both cases. 
+dt_final_samples_merged <- merge(dt_final_samples, dt_pheno %>% rename(s=SAMPLE_ALIAS), by='s')
+
+dt_loc <- dt_final_samples_merged %>% rename(LOCATION = LOCATION.x) %>% group_by(LOCATION) %>% 
+    summarize(Controls = sum(PHENOTYPE_COARSE_NEW=="Control"),
+                       "Bipolar Disorder" = sum(PHENOTYPE_COARSE_NEW=="Bipolar Disorder"),
+                        Schizoaffective = sum(PHENOTYPE_COARSE_NEW=="Schizoaffective"),
+                        Schizophrenia = sum(PHENOTYPE_COARSE_NEW=="Schizophrenia"),
+                        Other=sum(PHENOTYPE_COARSE_NEW=="Other"),
+                        Unknown=sum(PHENOTYPE_COARSE_NEW=="Unknown"),
                         Total=n())
 dt_loc <- rbind(dt_loc, c("Total", colSums(dt_loc[,2:ncol(dt_loc)])))
 
 fwrite(dt_loc, file="../phenotype_data/17_phenotypes_and_location_summary.tsv", row.names=FALSE, sep='\t')
-dt_loc <- fread("../phenotype_data/17_phenotypes_and_location_summary.tsv")
+dt_loc <- fread("../phenotype_data/17_phenotypes_and_location_summary.tsv") %>% rename(Location=LOCATION)
 dt_loc %>%
   kable("html", escape=FALSE, format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
   row_spec(nrow(dt_loc), bold = T, color = "white", background = "#f65200") %>%  
-  kable_styling('hover')
+  kable_styling('hover', font_size=12)
 
 ```
 
@@ -507,21 +572,25 @@ The bipolar subtype information of the curated samples is:
 
 ```{r final_sample_subtype_composition, echo=FALSE, out.width = '100%', warning=FALSE}
 
-dt_loc <- dt_pheno %>% group_by(LOCATION) %>% 
-    summarize(Controls = sum(PHENOTYPE_FINE=="Control"),
-                       "Bipolar Disorder 1" = sum(PHENOTYPE_FINE=="Bipolar Disorder 1"),
-                       "Bipolar Disorder 2" = sum(PHENOTYPE_FINE=="Bipolar Disorder 2"),
-                       "Bipolar Disorder" = sum(PHENOTYPE_FINE=="Bipolar Disorder"),
-                        Schizoaffective = sum(PHENOTYPE_FINE=="Schizoaffective"))
+dt_loc <- dt_final_samples_merged %>% rename(LOCATION = LOCATION.x) %>% group_by(LOCATION) %>% 
+    summarize("Bipolar Disorder 1" = sum(PHENOTYPE_FINE_NEW=="Bipolar Disorder 1"),
+              "Bipolar Disorder 2" = sum(PHENOTYPE_FINE_NEW=="Bipolar Disorder 2"),
+              "Bipolar Disorder NOS" = sum(PHENOTYPE_FINE_NEW=="Bipolar Disorder"),
+              "Schizoaffective" = sum(PHENOTYPE_FINE_NEW=="Schizoaffective"),
+              "Bipolar Total (including schizoaffective)" = sum(PHENOTYPE_FINE_NEW=="Bipolar Disorder" |
+                                PHENOTYPE_FINE_NEW=="Bipolar Disorder 1" | 
+                                PHENOTYPE_FINE_NEW=="Bipolar Disorder 2" |
+                                PHENOTYPE_FINE_NEW=="Schizoaffective"),
+              "Controls" = sum(PHENOTYPE_FINE_NEW=="Control"))
 dt_loc <- rbind(dt_loc, c("Total", colSums(dt_loc[,2:ncol(dt_loc)])))
 fwrite(dt_loc, file="../phenotype_data/17_subphenotypes_and_location_summary.tsv", row.names=FALSE, sep='\t')
-dt_loc <- fread("../phenotype_data/17_subphenotypes_and_location_summary.tsv")
-dt_loc$Total = rowSums(dt_loc[,2:ncol(dt_loc)])
+dt_loc <- fread("../phenotype_data/17_subphenotypes_and_location_summary.tsv") %>% rename(Location=LOCATION)
+dt_loc$Total = rowSums(dt_loc[,c("Controls", "Bipolar Total (including schizoaffective)")])
 
 dt_loc %>%
   kable("html", escape=FALSE, format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
   row_spec(nrow(dt_loc), bold = T, color = "white", background = "#f65200") %>%  
-  kable_styling('hover')
+  kable_styling('hover', font_size=12)
 
 ```
 

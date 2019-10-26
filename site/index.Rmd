@@ -1,5 +1,5 @@
 ---
-title: '<div><img src="bipex.svg" style="width:50px;height:50px;"/> BipEx: Bipolar Exomes</div>'
+title: '<div>BipEx: <b>Bip</b>olar <b>Ex</b>omes</div>'
 output: 
   html_document:
     theme: united
@@ -10,10 +10,12 @@ output:
 <br>
 
 <center>
-```{r init_samples, echo=FALSE, out.width = '50%'}
+```{r init_samples, echo=FALSE, out.width = '30%'}
 knitr::include_graphics("bipex.svg")
 ```
 </center>
+
+<br>
 
 <div class="well">
 

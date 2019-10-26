@@ -369,7 +369,10 @@ div.tocify {
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="qc.html">QC</a>
+  <a href="qc.html">Detailed QC</a>
+</li>
+<li>
+  <a href="qc_summary.html">QC Summary</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -393,16 +396,13 @@ div.tocify {
 </div>
 
 
-<p>On this page we detail the quality control (QC) pipeline for for the BipEx dataset. Further plots, the underlying <a href="https://github.com/astheeggeggs/BipEx/tree/master/scripts_Dalio/QC_Dalio">code</a> and a <a href="https://github.com/astheeggeggs/BipEx/blob/master/scripts_Dalio/QC_Dalio/QC_pipeline_writeup/pipeline_writeup.tex">document</a> summarising the pipeline can be found on the BipEx github <a href="https://github.com/astheeggeggs/BipEx">repository</a>.</p>
+<p><br> On this page we detail the quality control (QC) pipeline for for the BipEx dataset. Further plots, the underlying <a href="https://github.com/astheeggeggs/BipEx/tree/master/scripts_Dalio/QC_Dalio">code</a> and a <a href="https://github.com/astheeggeggs/BipEx/blob/master/scripts_Dalio/QC_Dalio/QC_pipeline_writeup/pipeline_writeup.tex">document</a> summarising the pipeline can be found on the BipEx github <a href="https://github.com/astheeggeggs/BipEx">repository</a>.</p>
 <p>We first summarise the collection of samples, splitting across cohorts and subtypes. In addtition to Bipolar cases, we also a collection of Schizophrenia cases that will serve as positive controls for our PTV burden analyses.</p>
-<table class="table table-hover" style="margin-left: auto; margin-right: auto;">
+<table class="table table-hover" style="font-size: 12px; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
 <th style="text-align:left;font-weight: bold;">
-LOCATION
-</th>
-<th style="text-align:right;font-weight: bold;">
-Controls
+Location
 </th>
 <th style="text-align:right;font-weight: bold;">
 Bipolar Disorder
@@ -420,6 +420,9 @@ Other
 Unknown
 </th>
 <th style="text-align:right;font-weight: bold;">
+Controls
+</th>
+<th style="text-align:right;font-weight: bold;">
 Total
 </th>
 </tr>
@@ -428,9 +431,6 @@ Total
 <tr>
 <td style="text-align:left;">
 Aberdeen, UK
-</td>
-<td style="text-align:right;">
-331
 </td>
 <td style="text-align:right;">
 0
@@ -448,15 +448,15 @@ Aberdeen, UK
 1
 </td>
 <td style="text-align:right;">
+331
+</td>
+<td style="text-align:right;">
 896
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Amsterdam, NED
-</td>
-<td style="text-align:right;">
-1,611
 </td>
 <td style="text-align:right;">
 1,212
@@ -474,15 +474,15 @@ Amsterdam, NED
 17
 </td>
 <td style="text-align:right;">
+1,611
+</td>
+<td style="text-align:right;">
 2,920
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Baltimore, USA
-</td>
-<td style="text-align:right;">
-126
 </td>
 <td style="text-align:right;">
 380
@@ -500,15 +500,15 @@ Baltimore, USA
 0
 </td>
 <td style="text-align:right;">
+126
+</td>
+<td style="text-align:right;">
 514
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Boston, USA
-</td>
-<td style="text-align:right;">
-3,498
 </td>
 <td style="text-align:right;">
 3,449
@@ -526,6 +526,9 @@ Boston, USA
 0
 </td>
 <td style="text-align:right;">
+3,498
+</td>
+<td style="text-align:right;">
 6,999
 </td>
 </tr>
@@ -534,22 +537,22 @@ Boston, USA
 Cambridge, UK
 </td>
 <td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
 2,851
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
 </td>
 <td style="text-align:right;">
 2,851
@@ -558,9 +561,6 @@ Cambridge, UK
 <tr>
 <td style="text-align:left;">
 Cardiff, UK
-</td>
-<td style="text-align:right;">
-1,106
 </td>
 <td style="text-align:right;">
 2,442
@@ -578,15 +578,15 @@ Cardiff, UK
 0
 </td>
 <td style="text-align:right;">
+1,106
+</td>
+<td style="text-align:right;">
 6,624
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Dublin, IRE
-</td>
-<td style="text-align:right;">
-9
 </td>
 <td style="text-align:right;">
 180
@@ -604,15 +604,15 @@ Dublin, IRE
 0
 </td>
 <td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
 232
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Edinburgh, UK
-</td>
-<td style="text-align:right;">
-64
 </td>
 <td style="text-align:right;">
 885
@@ -630,15 +630,15 @@ Edinburgh, UK
 0
 </td>
 <td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
 1,259
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 London, UK
-</td>
-<td style="text-align:right;">
-1,203
 </td>
 <td style="text-align:right;">
 1,909
@@ -656,15 +656,15 @@ London, UK
 0
 </td>
 <td style="text-align:right;">
+1,203
+</td>
+<td style="text-align:right;">
 4,864
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Stockholm, SWE
-</td>
-<td style="text-align:right;">
-5,541
 </td>
 <td style="text-align:right;">
 5,160
@@ -682,15 +682,15 @@ Stockholm, SWE
 0
 </td>
 <td style="text-align:right;">
+5,541
+</td>
+<td style="text-align:right;">
 10,702
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Umea, SWE
-</td>
-<td style="text-align:right;">
-459
 </td>
 <td style="text-align:right;">
 472
@@ -708,15 +708,15 @@ Umea, SWE
 0
 </td>
 <td style="text-align:right;">
+459
+</td>
+<td style="text-align:right;">
 931
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Wurzburg, GER
-</td>
-<td style="text-align:right;">
-414
 </td>
 <td style="text-align:right;">
 397
@@ -734,15 +734,15 @@ Wurzburg, GER
 14
 </td>
 <td style="text-align:right;">
+414
+</td>
+<td style="text-align:right;">
 825
 </td>
 </tr>
 <tr>
 <td style="text-align:left;font-weight: bold;color: white !important;background-color: #f65200 !important;">
 Total
-</td>
-<td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-17,213
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
 16,486
@@ -760,17 +760,21 @@ Total
 32
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
+17,213
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
 39,617
 </td>
 </tr>
 </tbody>
 </table>
+<p><br></p>
 <p>Within the collection of Bipolar cases, we have subtype information: Bipolar 1, and Bipolar 2. Further splitting the cases and labelling Bipolar cases for whom we do not have subtype information available, we obtain the following numbers of samples in each subcategory:</p>
-<table class="table table-hover" style="margin-left: auto; margin-right: auto;">
+<table class="table table-hover" style="font-size: 12px; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
 <th style="text-align:left;font-weight: bold;">
-LOCATION
+Location
 </th>
 <th style="text-align:right;font-weight: bold;">
 Bipolar Disorder 1
@@ -785,7 +789,7 @@ Bipolar Disorder NOS
 Schizoaffective
 </th>
 <th style="text-align:right;font-weight: bold;">
-Bipolar Total
+Bipolar Total (including schizoaffective)
 </th>
 <th style="text-align:right;font-weight: bold;">
 Controls
@@ -833,19 +837,19 @@ Amsterdam, NED
 169
 </td>
 <td style="text-align:right;">
-10
+11
 </td>
 <td style="text-align:right;">
 21
 </td>
 <td style="text-align:right;">
-1,232
+1,233
 </td>
 <td style="text-align:right;">
 1,611
 </td>
 <td style="text-align:right;">
-2,843
+2,844
 </td>
 </tr>
 <tr>
@@ -1015,19 +1019,19 @@ London, UK
 372
 </td>
 <td style="text-align:right;">
-227
+228
 </td>
 <td style="text-align:right;">
 157
 </td>
 <td style="text-align:right;">
-2,065
+2,066
 </td>
 <td style="text-align:right;">
 1,203
 </td>
 <td style="text-align:right;">
-3,268
+3,269
 </td>
 </tr>
 <tr>
@@ -1119,32 +1123,30 @@ Total
 3,887
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-2,810
+2,812
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
 316
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-16,800
+16,802
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
 17,213
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-34,013
+34,015
 </td>
 </tr>
 </tbody>
 </table>
+<p><br></p>
 <p>Finally, the split by PI was as follows:</p>
-<table class="table table-hover" style="margin-left: auto; margin-right: auto;">
+<table class="table table-hover" style="font-size: 11px; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
 <th style="text-align:left;font-weight: bold;">
 PI
-</th>
-<th style="text-align:right;font-weight: bold;">
-Controls
 </th>
 <th style="text-align:right;font-weight: bold;">
 Bipolar Disorder 1
@@ -1171,6 +1173,9 @@ Other
 Unknown
 </th>
 <th style="text-align:right;font-weight: bold;">
+Controls
+</th>
+<th style="text-align:right;font-weight: bold;">
 Total
 </th>
 </tr>
@@ -1179,9 +1184,6 @@ Total
 <tr>
 <td style="text-align:left;">
 Andreas Reif
-</td>
-<td style="text-align:right;">
-414
 </td>
 <td style="text-align:right;">
 216
@@ -1208,6 +1210,9 @@ Andreas Reif
 14
 </td>
 <td style="text-align:right;">
+414
+</td>
+<td style="text-align:right;">
 825
 </td>
 </tr>
@@ -1216,31 +1221,31 @@ Andreas Reif
 Andrew McQuillin
 </td>
 <td style="text-align:right;">
-1,203
-</td>
-<td style="text-align:right;">
 1,309
 </td>
 <td style="text-align:right;">
 372
 </td>
 <td style="text-align:right;">
-227
+228
 </td>
 <td style="text-align:right;">
 157
 </td>
 <td style="text-align:right;">
-2,065
+2,066
 </td>
 <td style="text-align:right;">
 1,595
 </td>
 <td style="text-align:right;">
-1
+0
 </td>
 <td style="text-align:right;">
 0
+</td>
+<td style="text-align:right;">
+1,203
 </td>
 <td style="text-align:right;">
 4,864
@@ -1249,9 +1254,6 @@ Andrew McQuillin
 <tr>
 <td style="text-align:left;">
 Bob Yolken
-</td>
-<td style="text-align:right;">
-126
 </td>
 <td style="text-align:right;">
 117
@@ -1278,15 +1280,15 @@ Bob Yolken
 0
 </td>
 <td style="text-align:right;">
+126
+</td>
+<td style="text-align:right;">
 273
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Danielle Posthuma
-</td>
-<td style="text-align:right;">
-948
 </td>
 <td style="text-align:right;">
 0
@@ -1313,15 +1315,15 @@ Danielle Posthuma
 1
 </td>
 <td style="text-align:right;">
+948
+</td>
+<td style="text-align:right;">
 949
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 David St Clair
-</td>
-<td style="text-align:right;">
-331
 </td>
 <td style="text-align:right;">
 0
@@ -1348,15 +1350,15 @@ David St Clair
 1
 </td>
 <td style="text-align:right;">
+331
+</td>
+<td style="text-align:right;">
 896
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Derek Morris
-</td>
-<td style="text-align:right;">
-9
 </td>
 <td style="text-align:right;">
 180
@@ -1383,15 +1385,15 @@ Derek Morris
 0
 </td>
 <td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
 232
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Douglas Blackwood
-</td>
-<td style="text-align:right;">
-64
 </td>
 <td style="text-align:right;">
 368
@@ -1418,6 +1420,9 @@ Douglas Blackwood
 0
 </td>
 <td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
 1,259
 </td>
 </tr>
@@ -1426,9 +1431,6 @@ Douglas Blackwood
 Fernando Goes
 </td>
 <td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
 241
 </td>
 <td style="text-align:right;">
@@ -1442,6 +1444,9 @@ Fernando Goes
 </td>
 <td style="text-align:right;">
 241
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 0
@@ -1459,9 +1464,6 @@ Fernando Goes
 <tr>
 <td style="text-align:left;">
 Jordan Smoller
-</td>
-<td style="text-align:right;">
-3,498
 </td>
 <td style="text-align:right;">
 2,122
@@ -1488,15 +1490,15 @@ Jordan Smoller
 0
 </td>
 <td style="text-align:right;">
+3,498
+</td>
+<td style="text-align:right;">
 6,999
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Michael ODonovan
-</td>
-<td style="text-align:right;">
-0
 </td>
 <td style="text-align:right;">
 0
@@ -1523,6 +1525,9 @@ Michael ODonovan
 0
 </td>
 <td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
 2,998
 </td>
 </tr>
@@ -1531,31 +1536,31 @@ Michael ODonovan
 Michael Owen
 </td>
 <td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
 1,106
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
 </td>
 <td style="text-align:right;">
 1,106
@@ -1564,9 +1569,6 @@ Michael Owen
 <tr>
 <td style="text-align:left;">
 Mikael Landen
-</td>
-<td style="text-align:right;">
-761
 </td>
 <td style="text-align:right;">
 2,364
@@ -1593,6 +1595,9 @@ Mikael Landen
 0
 </td>
 <td style="text-align:right;">
+761
+</td>
+<td style="text-align:right;">
 5,922
 </td>
 </tr>
@@ -1601,31 +1606,31 @@ Mikael Landen
 Nancy Pedersen
 </td>
 <td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
 4,780
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
 </td>
 <td style="text-align:right;">
 4,780
@@ -1634,9 +1639,6 @@ Nancy Pedersen
 <tr>
 <td style="text-align:left;">
 Nick Craddock
-</td>
-<td style="text-align:right;">
-0
 </td>
 <td style="text-align:right;">
 1,518
@@ -1663,6 +1665,9 @@ Nick Craddock
 0
 </td>
 <td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
 2,520
 </td>
 </tr>
@@ -1671,31 +1676,31 @@ Nick Craddock
 Roel Ophoff
 </td>
 <td style="text-align:right;">
-663
-</td>
-<td style="text-align:right;">
 1,032
 </td>
 <td style="text-align:right;">
 169
 </td>
 <td style="text-align:right;">
-10
+11
 </td>
 <td style="text-align:right;">
 21
 </td>
 <td style="text-align:right;">
-1,232
+1,233
 </td>
 <td style="text-align:right;">
 1
 </td>
 <td style="text-align:right;">
-51
+58
 </td>
 <td style="text-align:right;">
-24
+16
+</td>
+<td style="text-align:right;">
+663
 </td>
 <td style="text-align:right;">
 1,971
@@ -1704,9 +1709,6 @@ Roel Ophoff
 <tr>
 <td style="text-align:left;">
 Rolf Adolfsson
-</td>
-<td style="text-align:right;">
-459
 </td>
 <td style="text-align:right;">
 320
@@ -1733,6 +1735,9 @@ Rolf Adolfsson
 0
 </td>
 <td style="text-align:right;">
+459
+</td>
+<td style="text-align:right;">
 931
 </td>
 </tr>
@@ -1741,38 +1746,74 @@ Rolf Adolfsson
 Willem Ouwehand
 </td>
 <td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
 2,851
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
 </td>
 <td style="text-align:right;">
 2,851
 </td>
 </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #f65200 !important;">
+Total
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
+9,787
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
+3,887
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
+2,812
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
+316
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
+16,802
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
+5,483
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
+87
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
+32
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
+17,213
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
+39,617
+</td>
+</tr>
 </tbody>
 </table>
+<p><br></p>
 <p>For our QC pipeline, we first read in the <code>.vcf</code> file, split multiallelics, and remove sites with more than 6 alleles. After splitting muliallelics in the <code>.vcf</code> file containing 29,911,479 variants and restricting to these sites, we have 37,344,246 variants.</p>
 <p><br></p>
 <div id="initial-genotype-filtering" class="section level1">
@@ -1827,7 +1868,7 @@ Variants
 <tbody>
 <tr>
 <td style="text-align:left;">
-Variants with &gt; 6 alleles
+Variants with &lt; 7 alleles
 </td>
 <td style="text-align:right;">
 37,344,246
@@ -1882,7 +1923,7 @@ Invariant sites after initial variant and genotype filters
 </tr>
 <tr>
 <td style="text-align:left;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-Variants after initial filter
+Variants after initial filtering
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
 6,829,373
@@ -1893,6 +1934,7 @@ Variants after initial filter
 </tr>
 </tbody>
 </table>
+<p><br></p>
 </div>
 <div id="initial-sample-quality-control" class="section level1">
 <h1>Initial sample quality control</h1>
@@ -1919,19 +1961,36 @@ Controls
 <tbody>
 <tr>
 <td style="text-align:left;">
-Initial samples
+Initial samples in vcf
 </td>
 <td style="text-align:right;">
-39,592
+39,618
 </td>
 <td style="text-align:right;">
-16,533
+16,486
 </td>
 <td style="text-align:right;">
-17,139
+17,212
 </td>
 <td style="text-align:right;">
 <span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 100.00%">100.0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Unable to phenotype and sequence information
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 0.00%">0.0</span>
 </td>
 </tr>
 <tr>
@@ -1942,10 +2001,10 @@ Unknown phenotype
 32
 </td>
 <td style="text-align:right;">
-0
+NA
 </td>
 <td style="text-align:right;">
-0
+NA
 </td>
 <td style="text-align:right;">
 <span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 0.10%">0.1</span>
@@ -1973,13 +2032,13 @@ Low coverage or high contamination
 Samples after initial filter
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-39,427
+39,451
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-16,461
+16,414
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-17,085
+17,158
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
 <span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 99.60%">99.6</span>
@@ -2020,16 +2079,16 @@ Controls
 <tbody>
 <tr>
 <td style="text-align:left;">
-Initial samples
+Samples after initial filter
 </td>
 <td style="text-align:right;">
-39,427
+39,451
 </td>
 <td style="text-align:right;">
-16,461
+16,414
 </td>
 <td style="text-align:right;">
-16,461
+17,158
 </td>
 <td style="text-align:right;">
 <span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 100.00%">100.0</span>
@@ -2057,13 +2116,13 @@ Sample call rate &lt; 0.93
 % FREEMIX contamination &gt; 0.02
 </td>
 <td style="text-align:right;">
-267
+268
 </td>
 <td style="text-align:right;">
 146
 </td>
 <td style="text-align:right;">
-103
+104
 </td>
 <td style="text-align:right;">
 <span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 0.70%">0.7</span>
@@ -2125,13 +2184,13 @@ Mean GQ &lt; 55
 Samples after sample QC filters
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-38,871
+38,894
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-16,185
+16,138
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-16,834
+16,906
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
 <span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 98.60%">98.6</span>
@@ -2175,16 +2234,16 @@ Controls
 <tbody>
 <tr>
 <td style="text-align:left;">
-Initial samples
+Samples after sample QC filters
 </td>
 <td style="text-align:right;">
-39,427
+38,894
 </td>
 <td style="text-align:right;">
-16,461
+16,138
 </td>
 <td style="text-align:right;">
-16,461
+16,906
 </td>
 <td style="text-align:right;">
 <span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 100.00%">100.0</span>
@@ -2212,16 +2271,16 @@ Samples with sex swap
 Samples after sex swap removal
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-38,633
+38,656
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-16,038
+15,991
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-16,782
+16,854
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 98.00%">98.0</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 99.40%">99.4</span>
 </td>
 </tr>
 </tbody>
@@ -2256,16 +2315,16 @@ Controls
 <tbody>
 <tr>
 <td style="text-align:left;">
-Initial samples
+Samples after sample QC filters
 </td>
 <td style="text-align:right;">
-39,427
+38,894
 </td>
 <td style="text-align:right;">
-16,461
+16,138
 </td>
 <td style="text-align:right;">
-16,461
+16,906
 </td>
 <td style="text-align:right;">
 <span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 100.00%">100.0</span>
@@ -2293,16 +2352,16 @@ Related samples for removal
 Samples after IBD removal
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-37,155
+37,178
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-15,393
+15,346
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-16,146
+16,218
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 94.20%">94.2</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 95.60%">95.6</span>
 </td>
 </tr>
 </tbody>
@@ -2325,97 +2384,6 @@ Samples after IBD removal
 <p><img src="QC_plots/sample_plots/10_PC1_PC2_1kg_collection.jpg" width="100%" /><img src="QC_plots/sample_plots/10_PC3_PC4_1kg_collection.jpg" width="100%" /><img src="QC_plots/sample_plots/10_PC5_PC6_1kg_collection.jpg" width="100%" /></p>
 <p>We restrict to the European subset of individuals to perform analysis. To do this, we train a random forest on the super populations labels of 1000 genomes and predict the super population that each of the BipEx samples. We denote strictly defined European subset as those with probability <span class="math inline">\(&gt;\)</span> 0.95 of being European according to the classifier. BipEx samples are coloured by their assignment or unsure if none of the classifier probabilities exceeded 0.95 in the following plots.</p>
 <p><img src="QC_plots/sample_plots/10_PC1_PC2_classify_EUR_strict.jpg" width="100%" /><img src="QC_plots/sample_plots/10_PC3_PC4_classify_EUR_strict.jpg" width="100%" /><img src="QC_plots/sample_plots/10_PC5_PC6_classify_EUR_strict.jpg" width="100%" /></p>
-<table class="table table-hover" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;font-weight: bold;">
-Filter
-</th>
-<th style="text-align:right;font-weight: bold;">
-Samples
-</th>
-<th style="text-align:right;font-weight: bold;">
-Bipolar cases
-</th>
-<th style="text-align:right;font-weight: bold;">
-Controls
-</th>
-<th style="text-align:right;font-weight: bold;">
-%
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-Initial samples
-</td>
-<td style="text-align:right;">
-37,187
-</td>
-<td style="text-align:right;">
-37,187
-</td>
-<td style="text-align:right;">
-16,147
-</td>
-<td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 100.00%">100.0</span>
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Non-European, strict filter
-</td>
-<td style="text-align:right;">
-2,451
-</td>
-<td style="text-align:right;">
-869
-</td>
-<td style="text-align:right;">
-1,246
-</td>
-<td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 6.60%">6.6</span>
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Non-European, loose filter
-</td>
-<td style="text-align:right;">
-1,214
-</td>
-<td style="text-align:right;">
-350
-</td>
-<td style="text-align:right;">
-618
-</td>
-<td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 3.30%">3.3</span>
-</td>
-</tr>
-<tr>
-<td style="text-align:left;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-Samples after strict European filter
-</td>
-<td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-2,451
-</td>
-<td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-869
-</td>
-<td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-1,246
-</td>
-<td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 6.60%">6.6</span>
-</td>
-</tr>
-</tbody>
-</table>
 <p>Samples not assigned to the European cluster were removed from downstream analysis.</p>
 <p>In addition, using a much looser definition of European, we restrict to US samples from MGH and Johns Hopkins, and run PCA. This enabled us to identify Ashkenazi Jewish clusters, and create a list of outliers (AJ or otherwise) for downstream removal or independent analysis.</p>
 <p>Run also ran a further collection of PCAs on:</p>
@@ -2449,16 +2417,16 @@ Controls
 <tbody>
 <tr>
 <td style="text-align:left;">
-Initial samples
+Samples after IBD removal
 </td>
 <td style="text-align:right;">
-37,187
+37,178
 </td>
 <td style="text-align:right;">
-37,187
+15,346
 </td>
 <td style="text-align:right;">
-16,147
+16,218
 </td>
 <td style="text-align:right;">
 <span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 100.00%">100.0</span>
@@ -2466,53 +2434,36 @@ Initial samples
 </tr>
 <tr>
 <td style="text-align:left;">
-Non-European, strict filter
+PCA based filters
 </td>
 <td style="text-align:right;">
-2,451
+2,880
 </td>
 <td style="text-align:right;">
-869
+1,120
 </td>
 <td style="text-align:right;">
-1,246
+1,422
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 6.60%">6.6</span>
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Non-European, loose filter
-</td>
-<td style="text-align:right;">
-1,214
-</td>
-<td style="text-align:right;">
-350
-</td>
-<td style="text-align:right;">
-618
-</td>
-<td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 3.30%">3.3</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 7.70%">7.7</span>
 </td>
 </tr>
 <tr>
 <td style="text-align:left;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-Samples after strict European filter
+Samples after population filters
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-2,451
+34,298
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-869
+14,226
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-1,246
+14,796
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 6.60%">6.6</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 92.30%">92.3</span>
 </td>
 </tr>
 </tbody>
@@ -2681,10 +2632,10 @@ Samples after population filters
 34,298
 </td>
 <td style="text-align:right;">
-14,274
+14,226
 </td>
 <td style="text-align:right;">
-14,746
+14,796
 </td>
 <td style="text-align:right;">
 <span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 100.00%">100.0</span>
@@ -2749,10 +2700,10 @@ Within location n singletons outside 3 standard deviations
 443
 </td>
 <td style="text-align:right;">
-153
+151
 </td>
 <td style="text-align:right;">
-234
+236
 </td>
 <td style="text-align:right;">
 <span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 1.30%">1.3</span>
@@ -2766,10 +2717,10 @@ Samples after filters
 33,527
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-13,979
+13,933
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-14,374
+14,422
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
 <span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightgreen; width: 97.80%">97.8</span>
@@ -2782,11 +2733,11 @@ Samples after filters
 <p><br></p>
 <p>After all of this data cleaning, we save the resultant hail matrix tables for downstream analyses.</p>
 <p>The resultant composition of the samples was as follows:</p>
-<table class="table table-hover" style="margin-left: auto; margin-right: auto;">
+<table class="table table-hover" style="font-size: 12px; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
 <th style="text-align:left;font-weight: bold;">
-LOCATION
+Location
 </th>
 <th style="text-align:right;font-weight: bold;">
 Controls
@@ -2817,7 +2768,7 @@ Total
 Aberdeen, UK
 </td>
 <td style="text-align:right;">
-331
+322
 </td>
 <td style="text-align:right;">
 0
@@ -2826,7 +2777,7 @@ Aberdeen, UK
 0
 </td>
 <td style="text-align:right;">
-564
+521
 </td>
 <td style="text-align:right;">
 0
@@ -2835,7 +2786,7 @@ Aberdeen, UK
 1
 </td>
 <td style="text-align:right;">
-896
+844
 </td>
 </tr>
 <tr>
@@ -2843,25 +2794,25 @@ Aberdeen, UK
 Amsterdam, NED
 </td>
 <td style="text-align:right;">
-1,611
+1,359
 </td>
 <td style="text-align:right;">
-1,212
+1,116
 </td>
 <td style="text-align:right;">
-21
+19
 </td>
 <td style="text-align:right;">
 1
 </td>
 <td style="text-align:right;">
-58
+57
 </td>
 <td style="text-align:right;">
 17
 </td>
 <td style="text-align:right;">
-2,920
+2,569
 </td>
 </tr>
 <tr>
@@ -2869,13 +2820,10 @@ Amsterdam, NED
 Baltimore, USA
 </td>
 <td style="text-align:right;">
-126
+41
 </td>
 <td style="text-align:right;">
-388
-</td>
-<td style="text-align:right;">
-0
+267
 </td>
 <td style="text-align:right;">
 0
@@ -2884,10 +2832,13 @@ Baltimore, USA
 0
 </td>
 <td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-514
+312
 </td>
 </tr>
 <tr>
@@ -2895,16 +2846,13 @@ Baltimore, USA
 Boston, USA
 </td>
 <td style="text-align:right;">
-3,498
+2,543
 </td>
 <td style="text-align:right;">
-3,501
+2,434
 </td>
 <td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
+31
 </td>
 <td style="text-align:right;">
 0
@@ -2913,7 +2861,10 @@ Boston, USA
 0
 </td>
 <td style="text-align:right;">
-6,999
+0
+</td>
+<td style="text-align:right;">
+5,008
 </td>
 </tr>
 <tr>
@@ -2921,7 +2872,7 @@ Boston, USA
 Cambridge, UK
 </td>
 <td style="text-align:right;">
-2,851
+2,656
 </td>
 <td style="text-align:right;">
 0
@@ -2939,7 +2890,7 @@ Cambridge, UK
 0
 </td>
 <td style="text-align:right;">
-2,851
+2,656
 </td>
 </tr>
 <tr>
@@ -2947,25 +2898,25 @@ Cambridge, UK
 Cardiff, UK
 </td>
 <td style="text-align:right;">
-1,106
+1,007
 </td>
 <td style="text-align:right;">
-2,450
+2,108
 </td>
 <td style="text-align:right;">
-60
+65
 </td>
 <td style="text-align:right;">
-2,990
+2,489
 </td>
 <td style="text-align:right;">
-18
+17
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-6,624
+5,686
 </td>
 </tr>
 <tr>
@@ -2973,25 +2924,25 @@ Cardiff, UK
 Dublin, IRE
 </td>
 <td style="text-align:right;">
-9
+7
 </td>
 <td style="text-align:right;">
-180
+150
 </td>
 <td style="text-align:right;">
 11
 </td>
 <td style="text-align:right;">
-29
+27
 </td>
 <td style="text-align:right;">
-3
+2
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-232
+197
 </td>
 </tr>
 <tr>
@@ -2999,16 +2950,16 @@ Dublin, IRE
 Edinburgh, UK
 </td>
 <td style="text-align:right;">
-64
+58
 </td>
 <td style="text-align:right;">
-885
+711
 </td>
 <td style="text-align:right;">
 6
 </td>
 <td style="text-align:right;">
-304
+271
 </td>
 <td style="text-align:right;">
 0
@@ -3017,7 +2968,7 @@ Edinburgh, UK
 0
 </td>
 <td style="text-align:right;">
-1,259
+1,046
 </td>
 </tr>
 <tr>
@@ -3025,25 +2976,25 @@ Edinburgh, UK
 London, UK
 </td>
 <td style="text-align:right;">
-1,164
+1,082
 </td>
 <td style="text-align:right;">
-2,057
+1,731
 </td>
 <td style="text-align:right;">
-5
+144
 </td>
 <td style="text-align:right;">
-1,595
+1,476
 </td>
 <td style="text-align:right;">
-4
+0
 </td>
 <td style="text-align:right;">
-39
+0
 </td>
 <td style="text-align:right;">
-4,864
+4,433
 </td>
 </tr>
 <tr>
@@ -3051,10 +3002,16 @@ London, UK
 Stockholm, SWE
 </td>
 <td style="text-align:right;">
-5,541
+4,530
 </td>
 <td style="text-align:right;">
-5,157
+4,609
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 0
@@ -3063,13 +3020,7 @@ Stockholm, SWE
 0
 </td>
 <td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-10,702
+9,140
 </td>
 </tr>
 <tr>
@@ -3077,13 +3028,10 @@ Stockholm, SWE
 Umea, SWE
 </td>
 <td style="text-align:right;">
-459
+426
 </td>
 <td style="text-align:right;">
-472
-</td>
-<td style="text-align:right;">
-0
+441
 </td>
 <td style="text-align:right;">
 0
@@ -3095,7 +3043,10 @@ Umea, SWE
 0
 </td>
 <td style="text-align:right;">
-931
+0
+</td>
+<td style="text-align:right;">
+867
 </td>
 </tr>
 <tr>
@@ -3103,13 +3054,10 @@ Umea, SWE
 Wurzburg, GER
 </td>
 <td style="text-align:right;">
-414
+391
 </td>
 <td style="text-align:right;">
-409
-</td>
-<td style="text-align:right;">
-0
+366
 </td>
 <td style="text-align:right;">
 0
@@ -3118,10 +3066,13 @@ Wurzburg, GER
 0
 </td>
 <td style="text-align:right;">
-2
+0
 </td>
 <td style="text-align:right;">
-825
+12
+</td>
+<td style="text-align:right;">
+769
 </td>
 </tr>
 <tr>
@@ -3129,38 +3080,35 @@ Wurzburg, GER
 Total
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-17,174
+14,422
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-16,711
+13,933
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-103
+277
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-5,483
+4,785
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-87
+80
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-59
+30
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-39,617
+33,527
 </td>
 </tr>
 </tbody>
 </table>
 <p>The bipolar subtype information of the curated samples is:</p>
-<table class="table table-hover" style="margin-left: auto; margin-right: auto;">
+<table class="table table-hover" style="font-size: 12px; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
 <th style="text-align:left;font-weight: bold;">
-LOCATION
-</th>
-<th style="text-align:right;font-weight: bold;">
-Controls
+Location
 </th>
 <th style="text-align:right;font-weight: bold;">
 Bipolar Disorder 1
@@ -3169,10 +3117,16 @@ Bipolar Disorder 1
 Bipolar Disorder 2
 </th>
 <th style="text-align:right;font-weight: bold;">
-Bipolar Disorder
+Bipolar Disorder NOS
 </th>
 <th style="text-align:right;font-weight: bold;">
 Schizoaffective
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar Total (including schizoaffective)
+</th>
+<th style="text-align:right;font-weight: bold;">
+Controls
 </th>
 <th style="text-align:right;font-weight: bold;">
 Total
@@ -3185,9 +3139,6 @@ Total
 Aberdeen, UK
 </td>
 <td style="text-align:right;">
-331
-</td>
-<td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
@@ -3200,7 +3151,13 @@ Aberdeen, UK
 0
 </td>
 <td style="text-align:right;">
-331
+0
+</td>
+<td style="text-align:right;">
+322
+</td>
+<td style="text-align:right;">
+322
 </td>
 </tr>
 <tr>
@@ -3208,22 +3165,25 @@ Aberdeen, UK
 Amsterdam, NED
 </td>
 <td style="text-align:right;">
-1,611
+951
 </td>
 <td style="text-align:right;">
-1,007
+155
 </td>
 <td style="text-align:right;">
-168
+10
 </td>
 <td style="text-align:right;">
-37
+19
 </td>
 <td style="text-align:right;">
-21
+1,135
 </td>
 <td style="text-align:right;">
-2,844
+1,359
+</td>
+<td style="text-align:right;">
+2,494
 </td>
 </tr>
 <tr>
@@ -3231,22 +3191,25 @@ Amsterdam, NED
 Baltimore, USA
 </td>
 <td style="text-align:right;">
-126
+254
 </td>
 <td style="text-align:right;">
-241
+6
 </td>
 <td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-147
+7
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-514
+267
+</td>
+<td style="text-align:right;">
+41
+</td>
+<td style="text-align:right;">
+308
 </td>
 </tr>
 <tr>
@@ -3254,22 +3217,25 @@ Baltimore, USA
 Boston, USA
 </td>
 <td style="text-align:right;">
-3,498
+1,503
 </td>
 <td style="text-align:right;">
-0
+279
 </td>
 <td style="text-align:right;">
-0
+652
 </td>
 <td style="text-align:right;">
-3,501
+31
 </td>
 <td style="text-align:right;">
-0
+2,465
 </td>
 <td style="text-align:right;">
-6,999
+2,543
+</td>
+<td style="text-align:right;">
+5,008
 </td>
 </tr>
 <tr>
@@ -3277,9 +3243,6 @@ Boston, USA
 Cambridge, UK
 </td>
 <td style="text-align:right;">
-2,851
-</td>
-<td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
@@ -3292,7 +3255,13 @@ Cambridge, UK
 0
 </td>
 <td style="text-align:right;">
-2,851
+0
+</td>
+<td style="text-align:right;">
+2,656
+</td>
+<td style="text-align:right;">
+2,656
 </td>
 </tr>
 <tr>
@@ -3300,22 +3269,25 @@ Cambridge, UK
 Cardiff, UK
 </td>
 <td style="text-align:right;">
-1,106
+1,301
 </td>
 <td style="text-align:right;">
-592
+681
 </td>
 <td style="text-align:right;">
-378
+126
 </td>
 <td style="text-align:right;">
-1,480
+65
 </td>
 <td style="text-align:right;">
-60
+2,173
 </td>
 <td style="text-align:right;">
-3,616
+1,007
+</td>
+<td style="text-align:right;">
+3,180
 </td>
 </tr>
 <tr>
@@ -3323,10 +3295,7 @@ Cardiff, UK
 Dublin, IRE
 </td>
 <td style="text-align:right;">
-9
-</td>
-<td style="text-align:right;">
-180
+150
 </td>
 <td style="text-align:right;">
 0
@@ -3338,7 +3307,13 @@ Dublin, IRE
 11
 </td>
 <td style="text-align:right;">
-200
+161
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+168
 </td>
 </tr>
 <tr>
@@ -3346,22 +3321,25 @@ Dublin, IRE
 Edinburgh, UK
 </td>
 <td style="text-align:right;">
-64
+317
 </td>
 <td style="text-align:right;">
-368
+94
 </td>
 <td style="text-align:right;">
-114
-</td>
-<td style="text-align:right;">
-403
+300
 </td>
 <td style="text-align:right;">
 6
 </td>
 <td style="text-align:right;">
-955
+717
+</td>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+775
 </td>
 </tr>
 <tr>
@@ -3369,22 +3347,25 @@ Edinburgh, UK
 London, UK
 </td>
 <td style="text-align:right;">
-1,164
+1,169
 </td>
 <td style="text-align:right;">
-0
+350
 </td>
 <td style="text-align:right;">
-0
+212
 </td>
 <td style="text-align:right;">
-2,057
+144
 </td>
 <td style="text-align:right;">
-5
+1,875
 </td>
 <td style="text-align:right;">
-3,226
+1,082
+</td>
+<td style="text-align:right;">
+2,957
 </td>
 </tr>
 <tr>
@@ -3392,22 +3373,25 @@ London, UK
 Stockholm, SWE
 </td>
 <td style="text-align:right;">
-5,541
+2,095
 </td>
 <td style="text-align:right;">
-2,274
+1,595
 </td>
 <td style="text-align:right;">
-1,748
+919
 </td>
 <td style="text-align:right;">
-1,135
+1
 </td>
 <td style="text-align:right;">
-0
+4,610
 </td>
 <td style="text-align:right;">
-10,698
+4,530
+</td>
+<td style="text-align:right;">
+9,140
 </td>
 </tr>
 <tr>
@@ -3415,13 +3399,10 @@ Stockholm, SWE
 Umea, SWE
 </td>
 <td style="text-align:right;">
-459
+297
 </td>
 <td style="text-align:right;">
-320
-</td>
-<td style="text-align:right;">
-149
+141
 </td>
 <td style="text-align:right;">
 3
@@ -3430,7 +3411,13 @@ Umea, SWE
 0
 </td>
 <td style="text-align:right;">
-931
+441
+</td>
+<td style="text-align:right;">
+426
+</td>
+<td style="text-align:right;">
+867
 </td>
 </tr>
 <tr>
@@ -3438,22 +3425,25 @@ Umea, SWE
 Wurzburg, GER
 </td>
 <td style="text-align:right;">
-414
+201
+</td>
+<td style="text-align:right;">
+145
+</td>
+<td style="text-align:right;">
+20
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-0
+366
 </td>
 <td style="text-align:right;">
-409
+391
 </td>
 <td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-823
+757
 </td>
 </tr>
 <tr>
@@ -3461,22 +3451,25 @@ Wurzburg, GER
 Total
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-17,174
+8,238
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-4,982
+3,446
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-2,557
+2,249
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-9,172
+277
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-103
+14,210
 </td>
 <td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
-33,988
+14,422
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #f65200 !important;">
+28,632
 </td>
 </tr>
 </tbody>
